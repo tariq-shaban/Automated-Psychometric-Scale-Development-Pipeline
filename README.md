@@ -758,11 +758,9 @@ Behavioural examples from Phase 1 may have been concentrated at one occurrence l
 
 ## 13. References
 
-Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. *Personality and Social Psychology Review*, *11*(2), 150–166. https://doi.org/10.1177/1088868306294907
-
 Guenole, N., Samo, A., Campion, J. K., Meade, A., Sun, T., & Oswald, F. (2024, February). *Pseudo-discrimination parameters from language embeddings*. Presented February 2024.
 
-Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices*. Preprint.
+Guenole, N., D’Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices.
 
 Suárez-Álvarez, J., Fernández-Alonso, R., & Muñiz, J. (2026). Evaluating pseudo-factor analysis as a tool for item selection in psychological test development. *Psicothema*, *38*(1), 1–12.
 
@@ -773,7 +771,6 @@ Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psy
 Lee, J. Y., Joo, S. H., Antonakis, J., & Rounds, J. (2025). The journey of forced-choice measurement over 80 years: Past, present, and future. *Annual Review of Organizational Psychology and Organizational Behavior*, *12*, 1–30. https://doi.org/10.1146/annurev-orgpsych-021124-055748
 
 Lorenzo-Seva, U., & ten Berge, J. M. F. (2006). Tucker's congruence coefficient as a meaningful index of factor similarity. *Methodology: European Journal of Research Methods for the Behavioral and Social Sciences*, *2*(2), 57–64. https://doi.org/10.1027/1614-2241.2.2.57
-
 
 ---
 
