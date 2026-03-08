@@ -242,8 +242,8 @@
         "operator": ">="
       },
       "Rule_2_Adequate_Single_Factor": {
-        "description": "Single factor loading >= 0.20",
-        "threshold": 0.2,
+        "description": "Single factor loading >= 0.30",
+        "threshold": 0.3,
         "operator": ">="
       },
       "Rule_3_Adequate_Communality": {
