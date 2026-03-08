@@ -760,19 +760,20 @@ Behavioural examples from Phase 1 may have been concentrated at one occurrence l
 
 Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. *Personality and Social Psychology Review*, *11*(2), 150–166. https://doi.org/10.1177/1088868306294907
 
-Guenole, N., Samo, A., & Sun, T. (2024). *Pseudo-discrimination parameters from language embeddings*. Open Science Framework. https://doi.org/10.31234/osf.io/9a4qx
+Guenole, N., Samo, A., Campion, J. K., Meade, A., Sun, T., & Oswald, F. (2024, February). *Pseudo-discrimination parameters from language embeddings*. Presented February 2024.
 
-Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. B. (2025). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices*. Manuscript in preparation.
+Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices*. Preprint.
 
-Lee, J. Y., Joo, S. H., Antonakis, J., & Rounds, J. (2025a). The journey of forced-choice measurement over 80 years: Past, present, and future. *Annual Review of Organizational Psychology and Organizational Behavior*, *12*, 1–30. https://doi.org/10.1146/annurev-orgpsych-021124-055748
-
-Lee, J. Y., Li, Y., & Rounds, J. (2025b). *AI-powered item generation for psychological tests*. Manuscript submitted for publication.
-
-Lorenzo-Seva, U., & ten Berge, J. M. F. (2006). Tucker's congruence coefficient as a meaningful index of factor similarity. *Methodology: European Journal of Research Methods for the Behavioral and Social Sciences*, *2*(2), 57–64. https://doi.org/10.1027/1614-2241.2.2.57
+Suárez-Álvarez, J., Fernández-Alonso, R., & Muñiz, J. (2026). Evaluating pseudo-factor analysis as a tool for item selection in psychological test development. *Psicothema*, *38*(1), 1–12.
 
 Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168. https://doi.org/10.1016/j.crbeha.2025.100168
 
-Suárez-Álvarez, J., Fernández-Alonso, R., & Muñiz, J. (2026). Evaluating pseudo-factor analysis as a tool for item selection in psychological test development. *Psicothema*, *38*(1), 1–12.
+Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1–29.
+
+Lee, J. Y., Joo, S. H., Antonakis, J., & Rounds, J. (2025). The journey of forced-choice measurement over 80 years: Past, present, and future. *Annual Review of Organizational Psychology and Organizational Behavior*, *12*, 1–30. https://doi.org/10.1146/annurev-orgpsych-021124-055748
+
+Lorenzo-Seva, U., & ten Berge, J. M. F. (2006). Tucker's congruence coefficient as a meaningful index of factor similarity. *Methodology: European Journal of Research Methods for the Behavioral and Social Sciences*, *2*(2), 57–64. https://doi.org/10.1027/1614-2241.2.2.57
+
 
 ---
 

@@ -1,0 +1,80 @@
+cff-version: 1.2.0
+message: "If you use this pipeline in your research, please cite it as below."
+type: software
+title: "Automated Psychometric Scale Development Pipeline"
+abstract: "An automated pipeline for AI-assisted psychometric scale development using Large Language Models and Pseudo-Factor Analysis. Generates, screens, and statistically evaluates assessment items before empirical data collection."
+authors:
+  - family-names: Shaban
+    given-names: Tariq
+    email: tariq@inubilum.io
+    affiliation: Inubilum Ltd
+    orcid: ""
+version: "1.0.0"
+date-released: 2026-03-01
+url: "https://github.com/tariq-shaban/psychometric-pipeline"
+license: MIT
+keywords:
+  - psychometrics
+  - scale development
+  - item generation
+  - large language models
+  - pseudo-factor analysis
+  - sentence transformers
+  - personality assessment
+  - natural language processing
+references:
+  - type: article
+    title: "Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices"
+    authors:
+      - family-names: Guenole
+        given-names: Nigel
+      - family-names: D'Urso
+        given-names: E. Damiano
+      - family-names: Samo
+        given-names: Andrew
+      - family-names: Sun
+        given-names: Tianjun
+      - family-names: Haslbeck
+        given-names: Jonas M. B.
+    year: 2025
+    notes: "Manuscript in preparation"
+  - type: article
+    title: "Evaluating pseudo-factor analysis as a tool for item selection in psychological test development"
+    authors:
+      - family-names: Suárez-Álvarez
+        given-names: Javier
+      - family-names: Fernández-Alonso
+        given-names: Rubén
+      - family-names: Muñiz
+        given-names: José
+    journal: "Psicothema"
+    volume: 38
+    issue: 1
+    pages: "1-12"
+    year: 2026
+  - type: article
+    title: "Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests"
+    authors:
+      - family-names: Milano
+        given-names: Nicola
+      - family-names: Luongo
+        given-names: Maria
+      - family-names: Ponticorvo
+        given-names: Michela
+      - family-names: Marocco
+        given-names: Davide
+    journal: "Current Research in Behavioral Sciences"
+    volume: 8
+    year: 2025
+    doi: "10.1016/j.crbeha.2025.100168"
+  - type: article
+    title: "AI-powered item generation for psychological tests"
+    authors:
+      - family-names: Lee
+        given-names: Jae Young
+      - family-names: Li
+        given-names: Yue
+      - family-names: Rounds
+        given-names: James
+    year: 2025
+    notes: "Manuscript submitted for publication"
