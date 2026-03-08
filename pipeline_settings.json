@@ -1,0 +1,345 @@
+{
+  "_comment": "Master settings file for Project Majdal pipeline. Edit these values before running the notebook.",
+  "project": {
+    "name": "Project Majdal",
+    "base_output_dir": "./output",
+    "scales_json": "./scales.json",
+    "all_scales_reference_json": "./scales.json",
+    "log_level": "INFO"
+  },
+  "scale_defaults": {
+    "_comment": "Default values applied to every scale when the field is missing from the source JSON. Edit these to match your population and environment.",
+    "target_population": {
+      "age_range": "18-65",
+      "education_level": "High school graduates or above",
+      "environment_context": "Workplace and social environments",
+      "cultural_context": "Global business context"
+    },
+    "target_environment": "General working population",
+    "reading_level_target": 8,
+    "response_format": "likert_5"
+  },
+  "phase_01_behavioral_domains": {
+    "_comment": "Behavioral domain generation. LEVEL = likelihood of occurrence in target environment, not item difficulty.",
+    "examples_per_construct": 5,
+    "output_file": "01_behavioral_domains.xlsx",
+    "model": "anthropic/claude-haiku-4.5",
+    "max_tokens": 1500,
+    "temperature": 0.7,
+    "retry_attempts": 3,
+    "retry_delay_base_seconds": 2,
+    "pass_rules": {
+      "min_examples_per_construct": {
+        "description": "Minimum behavioral examples required per construct before a warning is raised",
+        "threshold": 3,
+        "operator": ">="
+      }
+    },
+    "human_review_columns": {
+      "human_review_pass": "Boolean. Default True. Set False in Excel to exclude an example before Phase 2.",
+      "human_comments": "Free text. Reason for any override."
+    }
+  },
+  "phase_02_domain_validation": {
+    "_comment": "LLM-based validation of behavioral examples",
+    "output_file": "02_domain_validation.xlsx",
+    "model": "anthropic/claude-haiku-4.5",
+    "max_tokens": 2000,
+    "temperature": 0.3,
+    "retry_attempts": 3,
+    "min_valid_examples_threshold": 5,
+    "validation_criteria": [
+      "construct_validity",
+      "face_validity",
+      "content_coverage"
+    ],
+    "pass_rules": {
+      "construct_validity": {
+        "description": "LLM must judge the example as genuinely reflecting the target construct",
+        "threshold": true,
+        "operator": "=="
+      },
+      "face_validity": {
+        "description": "LLM must judge the example as appearing relevant to target respondents",
+        "threshold": true,
+        "operator": "=="
+      },
+      "discriminant_validity": {
+        "description": "LLM must judge the example as distinct from excluded constructs",
+        "threshold": true,
+        "operator": "=="
+      },
+      "min_valid_examples_per_scale": {
+        "description": "Minimum valid examples per scale after validation; below this raises a warning",
+        "threshold": 5,
+        "operator": ">="
+      }
+    },
+    "human_review_columns": {
+      "human_review_pass": "Boolean. Default True. Overrides system process_flag. Phase 3 reads this column.",
+      "human_comments": "Free text. Especially useful when validation_issues is populated."
+    }
+  },
+  "phase_03_item_generation": {
+    "_comment": "Stratified item generation from validated behavioral examples",
+    "output_file": "03_generated_items.xlsx",
+    "model": "anthropic/claude-haiku-4.5",
+    "max_tokens": 2000,
+    "temperature": 0.8,
+    "retry_attempts": 3,
+    "items_per_difficulty": {
+      "high": 10,
+      "moderate": 0,
+      "low": 10
+    },
+    "inter_example_delay_seconds": 1,
+    "duplicate_removal_threshold": 0.85,
+    "pass_rules": {
+      "duplicate_removal": {
+        "description": "Near-duplicate items (cosine similarity >= threshold) are removed",
+        "threshold": 0.85,
+        "operator": "<",
+        "field": "pairwise_cosine_similarity"
+      },
+      "max_word_count": {
+        "description": "Items exceeding this word count are flagged for review",
+        "threshold": 9,
+        "operator": "<="
+      },
+      "no_negations": {
+        "description": "Items containing negation patterns are flagged (I don't / I never / I am not)",
+        "pattern": "(?i)\\bI (don't|never|am not|cannot|won't|wouldn't)\\b",
+        "flag_only": true
+      }
+    },
+    "human_review_columns": {
+      "human_review_pass": "Boolean. Default True. Set False to exclude an item before readability analysis. Phase 4 reads this column.",
+      "human_comments": "Free text. Notes on obvious construct contamination or generation failure."
+    }
+  },
+  "phase_04_readability_bias": {
+    "_comment": "Readability analysis and bias detection",
+    "output_file": "04_readability_bias.xlsx",
+    "reading_level_target": 8,
+    "max_simplification_attempts": 3,
+    "reading_level_hard_cap": 12,
+    "simplification_model": "anthropic/claude-haiku-4.5",
+    "simplification_max_tokens": 150,
+    "simplification_temperature": 0.3,
+    "readability_metrics": [
+      "flesch_kincaid_grade",
+      "flesch_reading_ease",
+      "gunning_fog",
+      "coleman_liau_index",
+      "smog_index",
+      "automated_readability_index"
+    ],
+    "bias_categories": [
+      "gender",
+      "age",
+      "cultural",
+      "socioeconomic"
+    ],
+    "pass_rules": {
+      "readability_hard_cap": {
+        "description": "Items still above reading_level_hard_cap after all simplification attempts are flagged system_readability_pass=False",
+        "threshold": 12,
+        "field": "flesch_kincaid_grade",
+        "operator": "<="
+      },
+      "readability_soft_target": {
+        "description": "Items above reading_level_target (but below hard cap) are flagged above_reading_target=True for human review",
+        "threshold": 8,
+        "field": "flesch_kincaid_grade",
+        "operator": "<="
+      },
+      "bias_flag": {
+        "description": "Items matching bias patterns are flagged in bias_flags — not auto-excluded; human review required",
+        "categories": [
+          "gender",
+          "age",
+          "cultural",
+          "socioeconomic"
+        ],
+        "flag_only": true
+      }
+    },
+    "human_review_columns": {
+      "system_readability_pass": "System-set Boolean. False only if item remains above hard cap after all simplification attempts.",
+      "human_review_pass": "Boolean. Default True. Override system result. Phase 5 reads this column.",
+      "human_comments": "Free text. Required for any accepted bias-flagged item."
+    }
+  },
+  "phase_05_content_validity": {
+    "_comment": "Multi-LLM SME content validity review.",
+    "output_file": "05_content_validity.xlsx",
+    "sme_models": {
+      "anthropic": {
+        "provider": "anthropic",
+        "model_id": "anthropic/claude-haiku-4.5",
+        "role": "primary"
+      },
+      "openai": {
+        "provider": "openai",
+        "model_id": "openai/gpt-4o",
+        "role": "sme"
+      },
+      "google": {
+        "provider": "google",
+        "model_id": "google/gemini-2.0-flash-001",
+        "role": "sme"
+      },
+      "xai": {
+        "provider": "xai",
+        "model_id": "x-ai/grok-3-mini",
+        "role": "sme"
+      },
+      "deepseek": {
+        "provider": "deepseek",
+        "model_id": "deepseek/deepseek-chat",
+        "role": "sme"
+      }
+    },
+    "max_tokens": 500,
+    "temperature": 0.2,
+    "retry_attempts": 3,
+    "inter_item_delay_seconds": 0.5,
+    "target_fit_scale": "1-10",
+    "agreement_metrics": {
+      "scale_mapping_agreement": "proportion of SMEs whose mapped scale matches the intended/target scale",
+      "cv_majority_agreement": "proportion of SMEs who agreed with the majority vote (diagnostic only)",
+      "mean_target_rating": "average target-scale fit rating across all SMEs"
+    },
+    "pass_thresholds": {
+      "min_mean_target_rating": 6,
+      "min_scale_mapping_agreement": 0.6
+    },
+    "prompt_template": "You are a psychometric subject matter expert reviewing items for a psychological assessment.\n\nTARGET SCALE: {scale_name}\nTARGET SCALE DEFINITION: {scale_definition}\n\nAVAILABLE SCALES (name: definition):\n{all_scales_list}\n\nITEM: \"{item_text}\"\n\nYour tasks:\n1. MAP: From the available scales list, which single scale does this item best belong to? Provide the exact scale name.\n2. RATE: On a scale of 1-10, how well does this item measure the TARGET SCALE specifically? (1=completely unrelated, 10=perfect fit)\n3. RATIONALE: In 1-2 sentences, explain your mapping and rating.\n\nRespond in this exact JSON format:\n{{\"mapped_scale\": \"<scale name>\", \"target_fit_rating\": <1-10>, \"rationale\": \"<text>\"}}",
+    "sme_max_workers": 5,
+    "human_review_columns": {
+      "cv_pass": "System-set Boolean. True if both min_mean_target_rating and min_scale_mapping_agreement thresholds are met.",
+      "human_review_pass": "Boolean. Default True. Overrides cv_pass. Phase 6 reads this column.",
+      "human_comments": "Free text. Especially useful when cv_maps_to_target=False or rating is 6-7."
+    }
+  },
+  "phase_06_pseudo_factor_analysis": {
+    "_comment": "Semantic PFA using sentence transformers as a proxy for item correlations",
+    "output_file": "06_pseudo_factor_analysis.xlsx",
+    "reversal_detection": {
+		"model": "anthropic/claude-haiku-4.5",
+		"max_tokens": 100,
+		"temperature": 0.0,
+		"_comment": "LLM used to detect and rewrite semantically low-pole items before embedding. Temperature 0 for deterministic judgements. Only called for items that first match avoidance language patterns — most items skip the LLM call entirely."
+	},
+	"transformer_models": [
+		"all-MiniLM-L6-v2",
+		"all-mpnet-base-v2"
+	],
+    "pass_rules": {
+      "Rule_1_Strong_Single_Factor": {
+        "description": "Single factor loading >= 0.40",
+        "threshold": 0.4,
+        "operator": ">="
+      },
+      "Rule_2_Adequate_Single_Factor": {
+        "description": "Single factor loading >= 0.20",
+        "threshold": 0.2,
+        "operator": ">="
+      },
+      "Rule_3_Adequate_Communality": {
+        "description": "Communality >= 0.1",
+        "threshold": 0.1,
+        "operator": ">="
+      },
+      "Rule_4_Clean_Factor_Structure": {
+        "description": "Max secondary loading < 0.35",
+        "threshold": 0.35,
+        "operator": "<"
+      },
+      "Rule_5_Cross_Difficulty_Viable": {
+        "description": "All-items loading >= 0.20",
+        "threshold": 0.2,
+        "operator": ">="
+      },
+      "Rule_6_Within_Difficulty_Viable": {
+        "description": "Within-difficulty loading >= 0.25",
+        "threshold": 0.25,
+        "operator": ">="
+      }
+    },
+    "min_rules_to_pass": 3,
+    "model_fit_thresholds": {
+      "rmsr_max": 0.08,
+      "_comment": "RMSR is the only reliable fit metric for PFA (no sample size). See Suarez-Alvarez et al. (2026)."
+    },
+    "min_items_for_pfa": 4,
+    "min_scales_for_joint_analysis": 3,
+    "discriminant_validity": {
+      "target_to_max_ratio_min": 1.5,
+      "max_cross_loading_ceiling": 0.45,
+      "ceiling_enabled": true,
+      "_comment": "ratio: target loading / max cross-loading must exceed threshold. ceiling: absolute max cross-loading regardless of ratio (soft flag). Both configurable."
+    },
+    "human_review_columns": {
+      "pfa_pass_level": "System-set. HIGH_PASS | STANDARD_PASS | FAIL.",
+      "human_review_pass": "Boolean. Default True. Overrides pfa_pass_level. Phase 7 reads this column.",
+      "human_comments": "Free text. Especially important for DAAL failures and discriminant flags."
+    }
+  },
+  "phase_07_item_pool_assembly": {
+    "_comment": "Final item pool after all automated phases. Input to human review.",
+    "output_file": "07_item_pool_for_review.xlsx",
+    "high_pass_requires_rules": [
+      "Rule_1_Strong_Single_Factor",
+      "Rule_3_Adequate_Communality",
+      "Rule_4_Clean_Factor_Structure"
+    ],
+    "cv_pass_requires": {
+      "min_mean_target_rating": 6,
+      "min_scale_mapping_agreement": 0.6
+    },
+    "combined_pass_logic": "must_pass_pfa AND must_pass_cv",
+    "final_pool_target_per_difficulty": 20,
+    "include_columns": [
+      "item_id",
+      "scale_name",
+      "item_text",
+      "difficulty_target",
+      "source_example",
+      "occurrence_likelihood",
+      "flesch_kincaid_grade",
+      "was_simplified",
+      "bias_flags",
+      "cv_mean_target_rating",
+      "cv_std_target_rating",
+      "cv_scale_mapping_agreement",
+      "cv_majority_mapped_scale",
+      "cv_maps_to_target",
+      "pfa_atomic_single_loading",
+      "pfa_atomic_communality",
+      "pfa_atomic_max_sec_loading",
+      "pfa_macro_item_to_scale_sim",
+      "daal_identity_confirmed",
+      "discriminant_pass",
+      "discriminant_flag_review",
+      "discriminant_closest_scale",
+      "pfa_rules_passed_count",
+      "pfa_pass_level",
+      "Rule_1_Strong_Single_Factor",
+      "Rule_2_Adequate_Single_Factor",
+      "Rule_3_Adequate_Communality",
+      "Rule_4_Clean_Factor_Structure",
+      "Rule_5_Cross_Difficulty_Viable",
+      "Rule_6_Within_Difficulty_Viable",
+      "overall_pass",
+      "human_review_pass",
+      "human_comments",
+      "human_decision",
+      "human_notes"
+    ],
+    "human_review_columns": {
+      "human_decision": "Reviewer verdict: accept | modify | reject",
+      "human_notes": "Free text. Rationale, suggested rewording, or regeneration flags."
+    }
+  }
+}

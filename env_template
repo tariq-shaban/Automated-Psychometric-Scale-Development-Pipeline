@@ -1,0 +1,23 @@
+# ============================================================
+# Project Majdal – Environment Variables
+# ============================================================
+# Copy this file to .env and fill in your actual keys.
+# NEVER commit .env to version control.
+# ============================================================
+
+# OpenRouter API key (used for ALL LLM calls in the pipeline)
+# Get yours at: https://openrouter.ai/keys
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+
+# OpenRouter base URL (do not change unless instructed)
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+
+# Optional: your site name for OpenRouter analytics
+OPENROUTER_APP_NAME=Project Majdal
+
+# ============================================================
+# Path overrides (optional – defaults are set in pipeline_settings.json)
+# ============================================================
+# SCALES_JSON=./scales.json
+# ALL_SCALES_JSON=./majdal_scales.json
+# BASE_OUTPUT_DIR=./output

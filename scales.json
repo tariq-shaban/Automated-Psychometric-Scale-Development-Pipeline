@@ -1,0 +1,136 @@
+{
+  "scales": [
+    {
+      "id": "HH_Ho",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Honesty-Humility",
+      "construct_definition": "The tendency to be sincere, fair, and modest in dealings with others, and to avoid manipulating, exploiting, or deceiving people for personal gain. Individuals high in Honesty-Humility are guided by strong moral principles, treat others as equals regardless of status, avoid flattery or pretension, and are uninterested in accumulating wealth or social prestige at others' expense. They do not bend rules for personal advantage and feel uncomfortable with dishonest or corrupt behaviour. Those low in Honesty-Humility are more willing to deceive or manipulate others to achieve their goals, are motivated by status and material gain, feel entitled to special privileges, and may exploit others if it serves their interests.",
+      "high_anchor": "Avoids deception, manipulation, and exploitation in all dealings. Treats people fairly and impartially regardless of personal benefit. Is modest about achievements and unimpressed by wealth or social status. Feels strongly opposed to corruption, flattery, and rule-bending for personal advantage.",
+      "low_anchor": "Willing to use flattery, deception, or manipulation to get what they want. Motivated by wealth, status, and personal gain. Feels entitled to special treatment. Comfortable bending rules when it benefits them personally.",
+      "measure_type": "Trait",
+      "discriminant_description": "Honesty-Humility is distinct from Agreeableness, which concerns tolerant and cooperative behaviour toward others rather than moral integrity and the avoidance of exploitation. It is also distinct from Conscientiousness, which concerns self-discipline and organisation rather than ethical conduct.",
+      "target_population": {
+        "age_range": "18-65",
+        "education_level": "High school graduates or above",
+        "environment_context": "Workplace and social environments",
+        "cultural_context": "Global business context"
+      },
+      "target_environment": "General working population",
+      "reading_level_target": 8,
+      "response_format": "likert_5",
+      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
+    },
+    {
+      "id": "Em_Em",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Emotionality",
+      "construct_definition": "The tendency to experience fear, anxiety, and emotional distress in response to perceived threats, and to feel a strong need for emotional support from others. Individuals high in Emotionality are sensitive to physical and social dangers, feel emotionally close to others and empathise readily, and experience strong feelings of worry and vulnerability. They form deep emotional bonds and are sensitive to the emotional needs of people around them. Those low in Emotionality are emotionally resilient, calm under pressure, relatively unconcerned about physical danger, and less dependent on others for emotional support. They tend to experience feelings with less intensity and are less prone to distress.",
+      "high_anchor": "Worries frequently about potential dangers and feels anxious in uncertain situations. Feels a strong need for emotional closeness with others. Is easily moved by others' distress and is highly attuned to emotional undercurrents. Experiences feelings with considerable intensity.",
+      "low_anchor": "Remains calm and untroubled in threatening or uncertain situations. Is emotionally self-sufficient and does not depend on others for reassurance. Is less responsive to others' emotional distress. Experiences feelings with relatively low intensity.",
+      "measure_type": "Trait",
+      "discriminant_description": "Emotionality in the HEXACO model differs from Neuroticism in the Big Five. Emotionality includes a sentimental, empathic component — the tendency to feel close to others and be moved by their distress — which is absent from Neuroticism. Emotionality is distinct from Agreeableness, which concerns tolerance and cooperation rather than emotional sensitivity and need for closeness.",
+      "target_population": {
+        "age_range": "18-65",
+        "education_level": "High school graduates or above",
+        "environment_context": "Workplace and social environments",
+        "cultural_context": "Global business context"
+      },
+      "target_environment": "General working population",
+      "reading_level_target": 8,
+      "response_format": "likert_5",
+      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
+    },
+    {
+      "id": "Ex_Ex",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Extraversion",
+      "construct_definition": "The tendency to feel positively about oneself and others, to enjoy social interaction and group activity, and to experience positive emotions readily. Individuals high in Extraversion feel comfortable and energised in social settings, enjoy being the centre of attention, express enthusiasm and positive affect openly, and tend to feel confident in social and leadership situations. Those low in Extraversion (high in Introversion) prefer solitary or small-group activities, feel less energised by social interaction, express less positive affect, and are less inclined to seek social dominance or attention.",
+      "high_anchor": "Feels energised and comfortable in social situations. Enjoys meeting new people, engaging in group activities, and being around others. Expresses positive emotions freely and is seen as warm and enthusiastic. Tends to take the lead in social settings.",
+      "low_anchor": "Prefers solitude or small familiar groups over large social gatherings. Feels drained rather than energised by extended social interaction. Is reserved in expressing positive emotions. Does not seek attention or social dominance.",
+      "measure_type": "Trait",
+      "discriminant_description": "Extraversion in the HEXACO model includes a self-esteem component that is absent from Big Five Extraversion. It is distinct from Openness to Experience, which concerns intellectual curiosity and aesthetic sensitivity rather than social engagement and positive affect.",
+      "target_population": {
+        "age_range": "18-65",
+        "education_level": "High school graduates or above",
+        "environment_context": "Workplace and social environments",
+        "cultural_context": "Global business context"
+      },
+      "target_environment": "General working population",
+      "reading_level_target": 8,
+      "response_format": "likert_5",
+      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
+    },
+    {
+      "id": "Ag_Ag",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Agreeableness",
+      "construct_definition": "The tendency to be forgiving, tolerant, and gentle in dealings with others, and to suppress feelings of anger and resentment when provoked or treated unfairly. Individuals high in Agreeableness are patient and accommodating, willing to overlook perceived wrongs, and inclined to cooperate rather than compete or retaliate. They avoid conflict, adopt a charitable view of others' intentions, and are not easily moved to anger or criticism. Those low in Agreeableness are critical, quick to judge, and inclined to hold grudges. They become easily irritated by others' faults, are willing to express anger, and may be combative or competitive in interpersonal situations.",
+      "high_anchor": "Responds to provocation or unfair treatment with patience and tolerance. Forgives perceived wrongs and does not hold grudges. Avoids conflict and is not easily moved to anger or criticism. Adopts a charitable view of others' motives and intentions.",
+      "low_anchor": "Becomes easily irritated or angered by others. Is critical of others' faults and quick to judge. Holds grudges and finds it difficult to forgive. Willing to express anger and engage in conflict when provoked.",
+      "measure_type": "Trait",
+      "discriminant_description": "In the HEXACO model, Agreeableness specifically concerns the tendency to suppress anger and tolerate others' behaviour toward oneself. It is distinct from Honesty-Humility, which concerns moral integrity and the avoidance of exploitation. It is also distinct from Emotionality, which concerns sensitivity to fear and need for emotional closeness rather than tolerance and anger management.",
+      "target_population": {
+        "age_range": "18-65",
+        "education_level": "High school graduates or above",
+        "environment_context": "Workplace and social environments",
+        "cultural_context": "Global business context"
+      },
+      "target_environment": "General working population",
+      "reading_level_target": 8,
+      "response_format": "likert_5",
+      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
+    },
+    {
+      "id": "Co_Co",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Conscientiousness",
+      "construct_definition": "The tendency to be organised, diligent, and self-disciplined in pursuing goals and meeting obligations. Individuals high in Conscientiousness work carefully and methodically, maintain order in their environment and schedules, deliberate thoroughly before acting, and follow through on commitments reliably. They are perfectionistic about the quality of their work and feel discomfort when tasks are left incomplete or done poorly. Those low in Conscientiousness are less organised and systematic in their approach to tasks, more impulsive in decision-making, less concerned with precision or thoroughness, and more tolerant of disorder and incomplete work.",
+      "high_anchor": "Works in an organised and systematic way. Takes care over the quality and accuracy of their work. Deliberates carefully before making decisions. Meets deadlines and follows through on commitments reliably. Feels discomfort when work is incomplete or disorderly.",
+      "low_anchor": "Approaches tasks in an unsystematic or disorganised way. Is less concerned with precision, thoroughness, or quality. Makes decisions impulsively without careful deliberation. Is tolerant of incomplete work and disorder.",
+      "measure_type": "Trait",
+      "discriminant_description": "Conscientiousness concerns self-regulation and task performance rather than moral conduct. It is distinct from Honesty-Humility, which concerns ethical integrity and fairness. It is also distinct from Openness to Experience, which concerns curiosity and creative thinking rather than orderliness and diligence.",
+      "target_population": {
+        "age_range": "18-65",
+        "education_level": "High school graduates or above",
+        "environment_context": "Workplace and social environments",
+        "cultural_context": "Global business context"
+      },
+      "target_environment": "General working population",
+      "reading_level_target": 8,
+      "response_format": "likert_5",
+      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
+    },
+    {
+      "id": "Op_Op",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Openness to Experience",
+      "construct_definition": "The tendency to seek out and appreciate aesthetic, intellectual, and creative experiences, and to engage imaginatively with ideas, art, and unconventional perspectives. Individuals high in Openness to Experience are curious, inventive, and drawn to novelty in both the intellectual and aesthetic domains. They enjoy abstract thinking, are attentive to beauty in art and nature, and are willing to reconsider conventional beliefs. Those low in Openness to Experience are more practically minded, less drawn to art or abstract ideas, prefer familiar and conventional approaches, and are less likely to question established ways of doing things.",
+      "high_anchor": "Is strongly drawn to art, music, literature, and aesthetic beauty. Enjoys abstract and theoretical thinking. Is imaginative and seeks out novel ideas and experiences. Is willing to question conventional beliefs and consider unconventional perspectives.",
+      "low_anchor": "Has little interest in art, aesthetics, or abstract intellectual pursuits. Prefers practical and concrete thinking over theoretical speculation. Is more comfortable with familiar, conventional approaches. Is less inclined to question established beliefs or explore unconventional ideas.",
+      "measure_type": "Trait",
+      "discriminant_description": "Openness to Experience concerns aesthetic sensitivity and intellectual curiosity rather than social behaviour or emotional experience. It is distinct from Extraversion, which concerns social engagement and positive affect. It is also distinct from Conscientiousness, which concerns orderliness and diligence rather than curiosity or imaginative thinking.",
+      "target_population": {
+        "age_range": "18-65",
+        "education_level": "High school graduates or above",
+        "environment_context": "Workplace and social environments",
+        "cultural_context": "Global business context"
+      },
+      "target_environment": "General working population",
+      "reading_level_target": 8,
+      "response_format": "likert_5",
+      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
+    }
+  ]
+}
