@@ -20,33 +20,17 @@
     "response_format": "likert_5"
   },
   "phase_01_behavioral_domains": {
-    "_comment": "Behavioral domain generation. LEVEL = likelihood of occurrence in target environment, not item difficulty.",
+    "_comment": "Behavioral domain generation AND validation in a single phase. Generates observable behavioral examples then validates each against construct, face, and discriminant validity. LEVEL = likelihood of occurrence in target environment, not item difficulty.",
     "examples_per_construct": 5,
     "output_file": "01_behavioral_domains.xlsx",
-    "model": "anthropic/claude-haiku-4.5",
-    "max_tokens": 1500,
-    "temperature": 0.7,
+    "generation_model": "anthropic/claude-haiku-4.5",
+    "generation_max_tokens": 1500,
+    "generation_temperature": 0.7,
+    "validation_model": "anthropic/claude-haiku-4.5",
+    "validation_max_tokens": 2000,
+    "validation_temperature": 0.3,
     "retry_attempts": 3,
     "retry_delay_base_seconds": 2,
-    "pass_rules": {
-      "min_examples_per_construct": {
-        "description": "Minimum behavioral examples required per construct before a warning is raised",
-        "threshold": 3,
-        "operator": ">="
-      }
-    },
-    "human_review_columns": {
-      "human_review_pass": "Boolean. Default True. Set False in Excel to exclude an example before Phase 2.",
-      "human_comments": "Free text. Reason for any override."
-    }
-  },
-  "phase_02_domain_validation": {
-    "_comment": "LLM-based validation of behavioral examples",
-    "output_file": "02_domain_validation.xlsx",
-    "model": "anthropic/claude-haiku-4.5",
-    "max_tokens": 2000,
-    "temperature": 0.3,
-    "retry_attempts": 3,
     "min_valid_examples_threshold": 5,
     "validation_criteria": [
       "construct_validity",
@@ -54,6 +38,11 @@
       "content_coverage"
     ],
     "pass_rules": {
+      "min_examples_per_construct": {
+        "description": "Minimum behavioral examples required per construct before a warning is raised",
+        "threshold": 3,
+        "operator": ">="
+      },
       "construct_validity": {
         "description": "LLM must judge the example as genuinely reflecting the target construct",
         "threshold": true,
@@ -76,13 +65,13 @@
       }
     },
     "human_review_columns": {
-      "human_review_pass": "Boolean. Default True. Overrides system process_flag. Phase 3 reads this column.",
-      "human_comments": "Free text. Especially useful when validation_issues is populated."
+      "human_review_pass": "Boolean. Default True. Set False in Excel to exclude an example before Phase 2.",
+      "human_comments": "Free text. Reason for any override."
     }
   },
-  "phase_03_item_generation": {
+  "phase_02_item_generation": {
     "_comment": "Stratified item generation from validated behavioral examples",
-    "output_file": "03_generated_items.xlsx",
+    "output_file": "02_generated_items.xlsx",
     "model": "anthropic/claude-haiku-4.5",
     "max_tokens": 2000,
     "temperature": 0.8,
@@ -113,13 +102,13 @@
       }
     },
     "human_review_columns": {
-      "human_review_pass": "Boolean. Default True. Set False to exclude an item before readability analysis. Phase 4 reads this column.",
+      "human_review_pass": "Boolean. Default True. Set False to exclude an item before readability analysis. Phase 3 reads this column.",
       "human_comments": "Free text. Notes on obvious construct contamination or generation failure."
     }
   },
-  "phase_04_readability_bias": {
+  "phase_03_readability_bias": {
     "_comment": "Readability analysis and bias detection",
-    "output_file": "04_readability_bias.xlsx",
+    "output_file": "03_readability_bias.xlsx",
     "reading_level_target": 8,
     "max_simplification_attempts": 3,
     "reading_level_hard_cap": 12,
@@ -154,7 +143,7 @@
         "operator": "<="
       },
       "bias_flag": {
-        "description": "Items matching bias patterns are flagged in bias_flags — not auto-excluded; human review required",
+        "description": "Items matching bias patterns are flagged in bias_flags \u2014 not auto-excluded; human review required",
         "categories": [
           "gender",
           "age",
@@ -166,75 +155,77 @@
     },
     "human_review_columns": {
       "system_readability_pass": "System-set Boolean. False only if item remains above hard cap after all simplification attempts.",
-      "human_review_pass": "Boolean. Default True. Override system result. Phase 5 reads this column.",
+      "human_review_pass": "Boolean. Default True. Override system result. Phase 4 reads this column.",
       "human_comments": "Free text. Required for any accepted bias-flagged item."
     }
   },
-  "phase_05_content_validity": {
-    "_comment": "Multi-LLM SME content validity review.",
-    "output_file": "05_content_validity.xlsx",
+  "phase_04_content_validity": {
+    "_comment": "Multi-LLM SME content validity review using correspondence (c-value) and distinctiveness (d-value) indices following Hinkin & Tracey (1999) as operationalized by Colquitt et al. (2019) and implemented in the LM-AIG framework (Lee, Son, & Jia, 2025).",
+    "output_file": "04_content_validity.xlsx",
     "sme_models": {
-      "anthropic": {
+      "sme1": {
         "provider": "anthropic",
         "model_id": "anthropic/claude-haiku-4.5",
         "role": "primary"
       },
-      "openai": {
+      "sme2": {
         "provider": "openai",
         "model_id": "openai/gpt-4o",
         "role": "sme"
       },
-      "google": {
+      "sme3": {
         "provider": "google",
         "model_id": "google/gemini-2.0-flash-001",
         "role": "sme"
       },
-      "xai": {
+      "sme4": {
         "provider": "xai",
         "model_id": "x-ai/grok-3-mini",
         "role": "sme"
       },
-      "deepseek": {
+      "sme5": {
         "provider": "deepseek",
         "model_id": "deepseek/deepseek-chat",
         "role": "sme"
       }
     },
-    "max_tokens": 500,
+    "max_tokens": 800,
     "temperature": 0.2,
     "retry_attempts": 3,
     "inter_item_delay_seconds": 0.5,
-    "target_fit_scale": "1-10",
+    "target_fit_scale": "1-7",
     "agreement_metrics": {
-      "scale_mapping_agreement": "proportion of SMEs whose mapped scale matches the intended/target scale",
-      "cv_majority_agreement": "proportion of SMEs who agreed with the majority vote (diagnostic only)",
-      "mean_target_rating": "average target-scale fit rating across all SMEs"
+      "c_value": "Correspondence index: average definitional correspondence rating for the target construct, normalized to 0-1 (Colquitt et al., 2019)",
+      "d_value": "Distinctiveness index: average of (target rating - orbiting rating) / (a - 1), where a = number of anchors on the rating scale (Colquitt et al., 2019)",
+      "scale_mapping_agreement": "proportion of SMEs whose best-rated scale matches the intended/target scale (diagnostic)",
+      "mean_target_rating": "average target-scale correspondence rating across all SMEs (diagnostic)"
     },
     "pass_thresholds": {
-      "min_mean_target_rating": 6,
-      "min_scale_mapping_agreement": 0.6
+      "min_c_value": 0.88,
+      "min_d_value": 0.35,
+      "min_scale_mapping_agreement": 0.6,
+      "_comment": "c-value and d-value thresholds from Colquitt et al. (2019). An item passes CV only if both c-value >= 0.88 AND d-value >= 0.35. scale_mapping_agreement is retained as a diagnostic metric."
     },
-    "prompt_template": "You are a psychometric subject matter expert reviewing items for a psychological assessment.\n\nTARGET SCALE: {scale_name}\nTARGET SCALE DEFINITION: {scale_definition}\n\nAVAILABLE SCALES (name: definition):\n{all_scales_list}\n\nITEM: \"{item_text}\"\n\nYour tasks:\n1. MAP: From the available scales list, which single scale does this item best belong to? Provide the exact scale name.\n2. RATE: On a scale of 1-10, how well does this item measure the TARGET SCALE specifically? (1=completely unrelated, 10=perfect fit)\n3. RATIONALE: In 1-2 sentences, explain your mapping and rating.\n\nRespond in this exact JSON format:\n{{\"mapped_scale\": \"<scale name>\", \"target_fit_rating\": <1-10>, \"rationale\": \"<text>\"}}",
+    "prompt_template": "You are a psychometric subject matter expert reviewing items for a psychological assessment.\n\nTARGET SCALE: {scale_name}\n\nALL SCALES (the item could potentially belong to any of these):\n{all_scales_block}\n\nITEM: \"{item_text}\"\n\nTASK: Rate how well this item corresponds to EACH of the scales listed above on a 1-7 scale:\n  1 = Not at all correspondent\n  4 = Moderately correspondent\n  7 = Completely correspondent\n\nAlso provide a brief rationale (1-2 sentences) for the target scale rating.\n\nRespond in this exact JSON format:\n{{\"ratings\": {{\"<scale_name_1>\": <1-7>, \"<scale_name_2>\": <1-7>, ...}}, \"rationale\": \"<text>\"}}",
     "sme_max_workers": 5,
     "human_review_columns": {
-      "cv_pass": "System-set Boolean. True if both min_mean_target_rating and min_scale_mapping_agreement thresholds are met.",
-      "human_review_pass": "Boolean. Default True. Overrides cv_pass. Phase 6 reads this column.",
-      "human_comments": "Free text. Especially useful when cv_maps_to_target=False or rating is 6-7."
+      "cv_pass": "System-set Boolean. True if both c-value >= min_c_value AND d-value >= min_d_value thresholds are met.",
+      "human_review_pass": "Boolean. Default True. Overrides cv_pass. Phase 5 reads this column.",
+      "human_comments": "Free text. Especially useful when c-value or d-value is borderline."
     }
   },
-  "phase_06_pseudo_factor_analysis": {
-    "_comment": "Semantic PFA using sentence transformers as a proxy for item correlations",
-    "output_file": "06_pseudo_factor_analysis.xlsx",
+  "phase_05_pseudo_factor_analysis": {
+    "_comment": "Semantic PFA using sentence transformers as a proxy for item correlations, followed by final item pool assembly and human review package. transformer_models is a list: if multiple models are specified, their cosine similarity matrices are averaged before factor analysis. Default is a single model.",
+    "output_file": "05_pseudo_factor_analysis.xlsx",
     "reversal_detection": {
-		"model": "anthropic/claude-haiku-4.5",
-		"max_tokens": 100,
-		"temperature": 0.0,
-		"_comment": "LLM used to detect and rewrite semantically low-pole items before embedding. Temperature 0 for deterministic judgements. Only called for items that first match avoidance language patterns — most items skip the LLM call entirely."
-	},
-	"transformer_models": [
-		"all-MiniLM-L6-v2",
-		"all-mpnet-base-v2"
-	],
+      "model": "anthropic/claude-haiku-4.5",
+      "max_tokens": 100,
+      "temperature": 0.0,
+      "_comment": "LLM used to detect and rewrite semantically low-pole items before embedding. Temperature 0 for deterministic judgments. Only called for items that first match avoidance language patterns \u2014 most items skip the LLM call entirely."
+    },
+    "transformer_models": [
+      "all-MiniLM-L6-v2"
+    ],
     "pass_rules": {
       "Rule_1_Strong_Single_Factor": {
         "description": "Single factor loading >= 0.40",
@@ -280,23 +271,14 @@
       "ceiling_enabled": true,
       "_comment": "ratio: target loading / max cross-loading must exceed threshold. ceiling: absolute max cross-loading regardless of ratio (soft flag). Both configurable."
     },
-    "human_review_columns": {
-      "pfa_pass_level": "System-set. HIGH_PASS | STANDARD_PASS | FAIL.",
-      "human_review_pass": "Boolean. Default True. Overrides pfa_pass_level. Phase 7 reads this column.",
-      "human_comments": "Free text. Especially important for DAAL failures and discriminant flags."
-    }
-  },
-  "phase_07_item_pool_assembly": {
-    "_comment": "Final item pool after all automated phases. Input to human review.",
-    "output_file": "07_item_pool_for_review.xlsx",
     "high_pass_requires_rules": [
       "Rule_1_Strong_Single_Factor",
       "Rule_3_Adequate_Communality",
       "Rule_4_Clean_Factor_Structure"
     ],
     "cv_pass_requires": {
-      "min_mean_target_rating": 6,
-      "min_scale_mapping_agreement": 0.6
+      "min_c_value": 0.88,
+      "min_d_value": 0.35
     },
     "combined_pass_logic": "must_pass_pfa AND must_pass_cv",
     "final_pool_target_per_difficulty": 20,
@@ -310,6 +292,8 @@
       "flesch_kincaid_grade",
       "was_simplified",
       "bias_flags",
+      "cv_c_value",
+      "cv_d_value",
       "cv_mean_target_rating",
       "cv_std_target_rating",
       "cv_scale_mapping_agreement",
@@ -338,6 +322,9 @@
       "human_notes"
     ],
     "human_review_columns": {
+      "pfa_pass_level": "System-set. HIGH_PASS | STANDARD_PASS | FAIL.",
+      "human_review_pass": "Boolean. Default True. Overrides pfa_pass_level.",
+      "human_comments": "Free text. Especially important for DAAL failures and discriminant flags.",
       "human_decision": "Reviewer verdict: accept | modify | reject",
       "human_notes": "Free text. Rationale, suggested rewording, or regeneration flags."
     }

@@ -71,28 +71,22 @@ The pipeline is a single Jupyter Notebook. Each phase reads the output of the pr
 ```
 scales.json (input)
     │
-    ├── PHASE 1 │ Behavioural Domain Generation   → 01_behavioral_domains.xlsx
-    ├── PHASE 2 │ Domain Validation               → 02_domain_validation.xlsx
-    ├── PHASE 3 │ Item Generation                 → 03_generated_items.xlsx
-    ├── PHASE 4 │ Readability & Bias Analysis     → 04_readability_bias.xlsx
-    ├── PHASE 5 │ Content Validity (LLM SMEs)     → 05_content_validity.xlsx
-    ├── PHASE 6 │ Pseudo-Factor Analysis          → 06_pseudo_factor_analysis.xlsx
-    └── PHASE 7 │ Item Pool Assembly              → 07_item_pool_for_review.xlsx
+    ├── PHASE 1 │ Behavioral Domain Generation and Validation → 01_behavioral_domains.xlsx
+    ├── PHASE 2 │ Item Generation                             → 02_generated_items.xlsx
+    ├── PHASE 3 │ Readability & Bias Analysis                 → 03_readability_bias.xlsx
+    ├── PHASE 4 │ Content Validity (LLM SMEs)                 → 04_content_validity.xlsx
+    └── PHASE 5 │ Pseudo-Factor Analysis and Final Review     → 05_pseudo_factor_analysis.xlsx
 ```
 
-**Phase 1** reads your construct definitions from `scales.json` and generates observable behavioural examples — recurring patterns of behaviour that someone with this trait would exhibit in the target environment. The `occurrence_likelihood` field (low / moderate / high) reflects how frequently the behaviour appears in context, not item difficulty.
+**Phase 1** reads your construct definitions from `scales.json`, generates observable behavioral examples — recurring patterns of behavior that someone with this trait would exhibit in the target environment — and then validates each example against three criteria: construct validity, face validity, and discriminant validity. Failed examples are flagged and excluded from item writing by default. The `occurrence_likelihood` field (low / moderate / high) reflects how frequently the behavior appears in context, not item difficulty.
 
-**Phase 2** passes each behavioural example to a second LLM for validation against three criteria: construct validity, face validity, and discriminant validity. Failed examples are flagged and excluded from item writing by default.
+**Phase 2** turns validated behavioral examples into survey items — first-person "I" statements following Goldberg item-writing principles: maximum 9 words, present tense, plain vocabulary, single idea, no negations. Each item is tightly anchored to its source behavioral domain to prevent the generic cross-domain duplication that occurs when items reflect the construct in general rather than a specific behavior.
 
-**Phase 3** turns validated behavioural examples into survey items — first-person "I" statements following Goldberg item-writing principles: maximum 9 words, present tense, plain vocabulary, single idea, no negations. Each item is tightly anchored to its source behavioural domain to prevent the generic cross-domain duplication that occurs when items reflect the construct in general rather than a specific behaviour.
+**Phase 3** computes six readability metrics per item. Items above the reading level hard cap are simplified automatically by LLM. Bias pattern detection flags gender, age, cultural, and socioeconomic language for human review.
 
-**Phase 4** computes six readability metrics per item. Items above the reading level hard cap are simplified automatically by LLM. Bias pattern detection flags gender, age, cultural, and socioeconomic language for human review.
+**Phase 4** has five LLM models acting as independent subject matter experts. Each rates the item's correspondence with every scale in the assessment on a 1–7 Likert scale. Two content validity indices are computed per item following Hinkin and Tracey (1999) and Colquitt et al. (2019): the **c-value** (correspondence — how well the item measures the target construct) and the **d-value** (distinctiveness — how clearly it separates from non-target constructs). Items only proceed if they clear both c-value ≥ 0.88 and d-value ≥ 0.35.
 
-**Phase 5** has five LLM models acting as independent subject matter experts. Each rates the item's fit to the target construct (1–10) and maps it to the best-matching scale from the full list. Items only proceed if they clear both a minimum mean rating and a minimum mapping agreement threshold.
-
-**Phase 6** is the statistical core. Sentence transformer embeddings serve as a semantic proxy for item inter-correlations, and factor analysis is applied to the resulting similarity matrices — the Pseudo-Factor Analysis (PFA) technique. Two transformer models are run in parallel and their similarity matrices averaged to improve reliability.
-
-**Phase 7** assembles the final review pool. Items that passed content validity and PFA are compiled into a structured Excel file with quality flags, scale-level recommendations, and blank columns for reviewer decisions.
+**Phase 5** is the statistical core and final review stage. Sentence transformer embeddings serve as a semantic proxy for item inter-correlations, and factor analysis is applied to the resulting similarity matrices — the Pseudo-Factor Analysis (PFA) technique. One or more transformer models can be configured; if multiple are listed, their similarity matrices are averaged to improve reliability. After PFA completes, the final review pool is assembled with quality flags, scale-level recommendations, and blank columns for reviewer decisions.
 
 ---
 
@@ -168,7 +162,7 @@ If any command fails with a Visual C++ error, complete Section 5.2, restart Anac
 
 ### 6.2 Install PyTorch with GPU support
 
-Phase 6 runs significantly faster on a GPU. Check your CUDA version first:
+Phase 5 runs significantly faster on a GPU. Check your CUDA version first:
 
 ```
 nvidia-smi
@@ -190,7 +184,7 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --force-reinstall
 ```
 
-> A CUDA version mismatch produces no error during installation. It only fails when Phase 6 tries to load PyTorch, producing a `WinError 1114` DLL error. Getting this right upfront avoids the most common Phase 6 failure.
+> A CUDA version mismatch produces no error during installation. It only fails when Phase 5 tries to load PyTorch, producing a `WinError 1114` DLL error. Getting this right upfront avoids the most common Phase 5 failure.
 
 ### 6.3 Set up your API key
 
@@ -224,8 +218,8 @@ The pipeline reads construct definitions from `scales.json`. This is the most im
 ```json
 {
   "scale_name": "Conscientiousness",
-  "construct_definition": "The tendency to be organised, diligent, and self-disciplined...",
-  "high_anchor": "Works in an organised and systematic way...",
+  "construct_definition": "The tendency to be organized, diligent, and self-disciplined...",
+  "high_anchor": "Works in an organized and systematic way...",
   "low_anchor": "Approaches tasks in an unsystematic way...",
   "measure_type": "Trait",
   "discriminant_description": "Conscientiousness concerns self-regulation, not moral conduct...",
@@ -245,7 +239,7 @@ The pipeline reads construct definitions from `scales.json`. This is the most im
 
 The `construct_definition` and `discriminant_description` fields are the two most critical inputs. A vague definition produces generic items. A definition that overlaps with another scale produces items that fail content validity and discriminant validity.
 
-Good construct definitions are behaviourally grounded — they describe what someone with this trait actually does, not just what they are. They are specific enough to be distinguished from adjacent constructs, and consistent in level of abstraction across all scales.
+Good construct definitions are behaviorally grounded — they describe what someone with this trait actually does, not just what they are. They are specific enough to be distinguished from adjacent constructs, and consistent in level of abstraction across all scales.
 
 The `discriminant_description` tells the LLM what this construct is NOT. For Conscientiousness this would be: "Conscientiousness concerns self-regulation and task performance, not moral conduct (Honesty-Humility) and not intellectual curiosity (Openness to Experience)." This single field does more to prevent cross-construct item contamination than any other configuration setting.
 
@@ -276,25 +270,23 @@ This means you can edit settings and re-run a phase without restarting the kerne
 
 ### Phase order
 
-Run phases strictly in order: 1 → 2 → 3 → 4 → 5 → 6 → 7. Each phase reads the previous phase's output. Phases can be re-run individually when needed.
+Run phases strictly in order: 1 → 2 → 3 → 4 → 5. Each phase reads the previous phase's output. Phases can be re-run individually when needed.
 
 ### Approximate run times
 
-For approximately 24 scales, 5 behavioural examples per scale, 5 items per difficulty level (600 items entering Phase 5), with a GPU:
+For approximately 24 scales, 5 behavioral examples per scale, 5 items per difficulty level (600 items entering Phase 5), with a GPU:
 
 | Phase | Approximate time | Bottleneck |
 |---|---|---|
-| Phase 1 | 5–10 minutes | LLM API calls |
-| Phase 2 | 10–20 minutes | LLM API calls |
-| Phase 3 | 20–60 minutes | LLM API calls |
-| Phase 4 | 2–5 minutes | Local computation + LLM simplification |
-| Phase 5 | 30–90 minutes | 5 parallel LLM reviewers × all items |
-| Phase 6 | 15–40 minutes | Transformer encoding |
-| Phase 7 | Under 1 minute | Assembly only |
+| Phase 1 | 15–30 minutes | LLM API calls (generation + validation) |
+| Phase 2 | 20–60 minutes | LLM API calls |
+| Phase 3 | 2–5 minutes | Local computation + LLM simplification |
+| Phase 4 | 30–90 minutes | 5 parallel LLM reviewers × all items |
+| Phase 5 | 15–40 minutes | Transformer encoding + assembly |
 
 ### Preventing computer sleep
 
-Phases 3 and 5 can run for over an hour. Computer sleep stalls them silently. Phase 5 has a checkpoint/resume system — if it does stall, simply re-run the cell and it resumes. For other phases prevention is the only option.
+Phases 2 and 4 can run for over an hour. Computer sleep stalls them silently. Phase 4 has a checkpoint/resume system — if it does stall, simply re-run the cell and it resumes. For other phases prevention is the only option.
 
 On Windows: Settings → System → Power & Sleep → set both "turn off" and "sleep" to **Never**.
 
@@ -308,40 +300,27 @@ Section 0 detects the notebook's location using VS Code's `__vsc_ipynb_file__` v
 
 ---
 
-### Phase 1 — Behavioural Domain Generation
+### Phase 1 — Behavioral Domain Generation and Validation
 
 **Input:** `scales.json`  
 **Output:** `01_behavioral_domains.xlsx`
 
-For each construct, the LLM generates observable behavioural examples. These describe recurring patterns of behaviour — not one-off scenarios. The `occurrence_likelihood` field (low / moderate / high) reflects how commonly the behaviour occurs in the target environment, not psychometric difficulty.
+For each construct, the LLM generates observable behavioral examples — recurring patterns of behavior, not one-off scenarios. The `occurrence_likelihood` field (low / moderate / high) reflects how commonly the behavior occurs in the target environment, not psychometric difficulty. A second LLM pass then validates each example against construct validity, face validity, and discriminant validity. Failed examples are flagged `process_flag = False`.
 
-**What to review:** Open `Behavioral_Domains` and read the examples per scale. They should sound like descriptions of actual workplace behaviour, not restatements of the definition. Generic or theoretical examples will produce generic items downstream.
+**What to review:** Open `Behavioral_Domains` and read the examples per scale. They should sound like descriptions of actual workplace behavior, not restatements of the definition. Check `Validation_Summary` for pass rates per scale. If a scale has fewer than 3 valid examples, Phase 2 will produce very few items — revise the construct definition or anchors in `scales.json`. Check `validation_issues` on failed examples — a pattern of discriminant validity failures points to a construct boundary problem.
 
 **Human review columns added:** `human_review_pass` (default `True`), `human_comments`. Phase 2 reads `human_review_pass`.
 
-**Key settings:** `examples_per_construct` (default 5), `temperature` (default 0.7).
+**Key settings:** `examples_per_construct` (default 5), `generation_temperature` (default 0.7).
 
 ---
 
-### Phase 2 — Domain Validation
+### Phase 2 — Item Generation
 
 **Input:** `01_behavioral_domains.xlsx` (respects `human_review_pass`)  
-**Output:** `02_domain_validation.xlsx`
+**Output:** `02_generated_items.xlsx`
 
-A second LLM evaluates each example against construct validity, face validity, and discriminant validity. Failed examples are flagged `process_flag = False`.
-
-**What to review:** Check `Validation_Summary` for pass rates per scale. If a scale has fewer than 3 valid examples, Phase 3 will produce very few items — revise the construct definition or anchors in `scales.json`. Check `validation_issues` on failed examples — a pattern of discriminant validity failures points to a construct boundary problem.
-
-**Human review columns added:** `human_review_pass` (default `True`), `human_comments`. Phase 3 reads `human_review_pass`.
-
----
-
-### Phase 3 — Item Generation
-
-**Input:** `02_domain_validation.xlsx` (respects `human_review_pass`)  
-**Output:** `03_generated_items.xlsx`
-
-Survey items are generated from validated behavioural examples. Each item must be tightly anchored to its specific source domain — not to the construct in general. This domain specificity requirement is enforced explicitly in the prompt with a concrete example contrasting a domain-specific item against a generic one.
+Survey items are generated from validated behavioral examples. Each item must be tightly anchored to its specific source domain — not to the construct in general. This domain specificity requirement is enforced explicitly in the prompt with a concrete example contrasting a domain-specific item against a generic one.
 
 Items are generated only for difficulty levels with a count greater than zero. Near-duplicate items are detected by TF-IDF cosine similarity and flagged (not removed) so a reviewer can choose which to keep.
 
@@ -359,10 +338,10 @@ Items are generated only for difficulty levels with a count greater than zero. N
 
 ---
 
-### Phase 4 — Readability and Bias Screening
+### Phase 3 — Readability and Bias Screening
 
-**Input:** `03_generated_items.xlsx` (respects `human_review_pass`)  
-**Output:** `04_readability_bias.xlsx`
+**Input:** `02_generated_items.xlsx` (respects `human_review_pass`)  
+**Output:** `03_readability_bias.xlsx`
 
 Six readability metrics are computed per item. Items above `reading_level_hard_cap` are simplified by LLM (up to `max_simplification_attempts` times). The original wording is preserved in `original_item_text`. Bias pattern matching flags gender, age, cultural, and socioeconomic language — items are flagged, not excluded.
 
@@ -372,10 +351,10 @@ Six readability metrics are computed per item. Items above `reading_level_hard_c
 
 ---
 
-### Phase 5 — Content Validity Review
+### Phase 4 — Content Validity Review
 
-**Input:** `04_readability_bias.xlsx` (respects `human_review_pass`)  
-**Output:** `05_content_validity.xlsx`
+**Input:** `03_readability_bias.xlsx` (respects `human_review_pass`)  
+**Output:** `04_content_validity.xlsx`
 
 Five LLM models act as independent subject matter experts. Each rates the item's target fit (1–10) and maps it to the best-matching scale from the full list. An item passes if both thresholds are met:
 
@@ -386,18 +365,18 @@ Progress is checkpointed every 100 items. If Phase 5 is interrupted, re-run the 
 
 **What to review:** Start with `CV_Scale_Summary` for pass rates per scale. A low pass rate (below 50%) signals a construct definition or discriminant description problem. Check `cv_majority_mapped_scale` on failing items — if they consistently map to a different scale, address the construct boundary before re-running. For borderline passers (rating 6–7), examine `cv_sme_rationale` to understand reviewer reasoning.
 
-**Human review columns added:** `cv_pass` (system-set), `human_review_pass` (default `True`), `human_comments`. Phase 6 reads `human_review_pass`.
+**Human review columns added:** `cv_pass` (system-set), `human_review_pass` (default `True`), `human_comments`. Phase 5 reads `human_review_pass`.
 
 **Thresholds:** Default 6.0 / 0.6. Raise to 7.0 / 0.8 for published instruments.
 
 ---
 
-### Phase 6 — Pseudo-Factor Analysis
+### Phase 5 — Pseudo-Factor Analysis and Final Review
 
-**Input:** `05_content_validity.xlsx` (respects `human_review_pass`)  
-**Output:** `06_pseudo_factor_analysis.xlsx`
+**Input:** `04_content_validity.xlsx` (respects `human_review_pass`)  
+**Output:** `05_pseudo_factor_analysis.xlsx`
 
-Phase 6 is the statistical core. Sentence transformer embeddings serve as a semantic proxy for item inter-correlations, and factor analysis is applied to the resulting similarity matrices — Pseudo-Factor Analysis (Guenole et al., 2025). Two transformer models (`all-MiniLM-L6-v2` and `all-mpnet-base-v2`) are used and their cosine similarity matrices averaged before factor analysis, following Guenole et al. (2025).
+Phase 5 is the statistical core and final review stage. Sentence transformer embeddings serve as a semantic proxy for item inter-correlations, and factor analysis is applied to the resulting similarity matrices — Pseudo-Factor Analysis (Guenole et al., 2025). One or more sentence transformer models can be specified in `pipeline_settings.json` under `transformer_models`. If multiple models are listed, their cosine similarity matrices are averaged before factor analysis, following Guenole et al. (2025). The default is `all-MiniLM-L6-v2`.
 
 **Negative item reversal for embedding**
 
@@ -418,7 +397,7 @@ Items describing the absence or avoidance of the construct (e.g., "I avoid plann
 
 **DAAL factor identity**
 
-In the joint multi-scale factor analysis, factors are labelled using the Dominant Average Absolute Loading (DAAL) approach (Guenole et al., 2025). For each extracted factor, the mean absolute loading of each scale's items on that factor is computed. The scale with the highest such value — the dominant average absolute loading — is assigned as the factor's label. A scale's DAAL identity is confirmed if its items load most strongly on the factor labelled with its name. Where two scales compete for the same factor, it is labelled `Unassigned`.
+In the joint multi-scale factor analysis, factors are labeled using the Dominant Average Absolute Loading (DAAL) approach (Guenole et al., 2025). For each extracted factor, the mean absolute loading of each scale's items on that factor is computed. The scale with the highest such value — the dominant average absolute loading — is assigned as the factor's label. A scale's DAAL identity is confirmed if its items load most strongly on the factor labeled with its name. Where two scales compete for the same factor, it is labeled `Unassigned`.
 
 **Tucker's congruence**
 
@@ -452,18 +431,11 @@ RMSR (Root Mean Square Residual) is the only reported fit metric. CFI, TLI, and 
 3. `Item_Scale_Heatmap` — visual scan for items whose peak similarity falls on the wrong column
 4. `PFA_Item_Results` — filter `discriminant_flag_review = True` and `item_reversed_for_embedding = True` first
 
-**Human review columns added:** `item_reversed_for_embedding` (system-set), `pfa_pass_level` (system-set), `human_review_pass` (default `True`), `human_comments`. Phase 7 reads `human_review_pass`.
+**Human review columns added:** `item_reversed_for_embedding` (system-set), `pfa_pass_level` (system-set), `human_review_pass` (default `True`), `human_comments`.
 
----
+After PFA completes, Phase 5 assembles the final review-ready item pool. Items where `human_review_pass` is not explicitly `False` are included in `Review_Pool`. Rejected items are preserved in `Rejected_Items` for audit purposes.
 
-### Phase 7 — Item Pool Assembly
-
-**Input:** `06_pseudo_factor_analysis.xlsx` (respects `human_review_pass`)  
-**Output:** `07_item_pool_for_review.xlsx`
-
-Assembles the final review-ready pool. Items where `human_review_pass` is not explicitly `False` are included in `Review_Pool`. Rejected items are preserved in `Rejected_Items` for audit purposes.
-
-**Output sheets:**
+**Additional output sheets:**
 
 - **`Review_Pool`** — all passing items with full quality metadata. Two blank columns for reviewer decisions.
 - **`Rejected_Items`** — excluded items, preserved for transparency.
@@ -473,7 +445,7 @@ Assembles the final review-ready pool. Items where `human_review_pass` is not ex
 
 **Reviewer workflow:**
 
-1. Start with **Recommendations** — resolve HIGH priority items before trialling
+1. Start with **Recommendations** — resolve HIGH priority items before trialing
 2. Work through **Quality_Flags** — review flagged items as batches by flag type
 3. Open **Review_Pool** scale by scale:
    - `human_decision`: type `accept`, `modify`, or `reject`
@@ -486,21 +458,25 @@ Assembles the final review-ready pool. Items where `human_review_pass` is not ex
 - Filter by `discriminant_flag_review = True` and compare flagged items within the same scale
 - Items where `cv_majority_mapped_scale` differs from the target scale often need rewording
 - Items where `item_reversed_for_embedding = True` — confirm the semantic direction is positive before accepting
-- If a scale has fewer than 15 passing items, re-run Phase 3 for that scale before completing review
+- If a scale has fewer than 15 passing items, re-run Phase 2 for that scale before completing review
 
 ---
 
 ## 10. Settings Reference
 
-All pipeline behaviour is controlled by `pipeline_settings.json`. Key settings are shown below; the file itself contains full annotated documentation.
+All pipeline behavior is controlled by `pipeline_settings.json`. Key settings are shown below; the file itself contains full annotated documentation.
 
 ### Phase 1
 
 ```json
 "phase_01_behavioral_domains": {
   "examples_per_construct": 5,
-  "model": "anthropic/claude-haiku-4.5",
-  "temperature": 0.7,
+  "generation_model": "anthropic/claude-haiku-4.5",
+  "generation_temperature": 0.7,
+  "validation_model": "anthropic/claude-haiku-4.5",
+  "validation_temperature": 0.3,
+  "min_valid_examples_threshold": 5,
+  "validation_criteria": ["construct_validity", "face_validity", "content_coverage"],
   "retry_attempts": 3
 }
 ```
@@ -508,18 +484,7 @@ All pipeline behaviour is controlled by `pipeline_settings.json`. Key settings a
 ### Phase 2
 
 ```json
-"phase_02_domain_validation": {
-  "min_valid_examples_threshold": 5,
-  "validation_criteria": ["construct_validity", "face_validity", "content_coverage"],
-  "model": "anthropic/claude-haiku-4.5",
-  "temperature": 0.3
-}
-```
-
-### Phase 3
-
-```json
-"phase_03_item_generation": {
+"phase_02_item_generation": {
   "items_per_difficulty": {"high": 5, "moderate": 5, "low": 5},
   "duplicate_removal_threshold": 0.85,
   "model": "anthropic/claude-haiku-4.5",
@@ -530,10 +495,10 @@ All pipeline behaviour is controlled by `pipeline_settings.json`. Key settings a
 
 Set any difficulty level to 0 to skip it entirely.
 
-### Phase 4
+### Phase 3
 
 ```json
-"phase_04_readability_bias": {
+"phase_03_readability_bias": {
   "reading_level_target": 8,
   "reading_level_hard_cap": 12,
   "max_simplification_attempts": 3,
@@ -541,25 +506,27 @@ Set any difficulty level to 0 to skip it entirely.
 }
 ```
 
-### Phase 5
+### Phase 4
 
 ```json
-"phase_05_content_validity": {
+"phase_04_content_validity": {
   "pass_thresholds": {
-    "min_mean_target_rating": 6,
+    "min_c_value": 0.88,
+    "min_d_value": 0.35,
     "min_scale_mapping_agreement": 0.6
   },
+  "target_fit_scale": "1-7",
   "sme_max_workers": 5
 }
 ```
 
-Raise to 7.0 / 0.8 for published instruments.
+c-value and d-value thresholds from Colquitt et al. (2019). Lower for exploratory work; raise for published instruments.
 
-### Phase 6
+### Phase 5
 
 ```json
-"phase_06_pseudo_factor_analysis": {
-  "transformer_models": ["all-MiniLM-L6-v2", "all-mpnet-base-v2"],
+"phase_05_pseudo_factor_analysis": {
+  "transformer_models": ["all-MiniLM-L6-v2"],
   "min_rules_to_pass": 3,
   "model_fit_thresholds": {"rmsr_max": 0.08},
   "discriminant_validity": {
@@ -574,13 +541,7 @@ Raise to 7.0 / 0.8 for published instruments.
 }
 ```
 
-### Phase 7
 
-```json
-"phase_07_item_pool_assembly": {
-  "final_pool_target_per_difficulty": 20
-}
-```
 
 ---
 
@@ -599,7 +560,7 @@ The `.env` file is missing or empty. Check it exists in the same folder as the n
 
 ---
 
-### Phases 1–3 (LLM generation)
+### Phases 1–2 (LLM generation)
 
 **`401 Unauthorized`**  
 API key is wrong or expired. Check https://openrouter.ai → API Keys and update `.env`.
@@ -614,14 +575,14 @@ Model names change when providers update their APIs. Check https://openrouter.ai
 Your `construct_definition` contains non-English text. All `scales.json` fields must be in English.
 
 **Items are too generic and not domain-specific**  
-The behavioural examples in Phase 1 may be too abstract. Review `01_behavioral_domains.xlsx` and ensure examples describe specific, observable behaviours. If examples are concrete but items remain generic, the `CRITICAL RULE — DOMAIN SPECIFICITY` block in the Phase 3 prompt is the lever — it uses the actual domain text as a concrete example of what specific vs. generic looks like.
+The behavioral examples in Phase 1 may be too abstract. Review `01_behavioral_domains.xlsx` and ensure examples describe specific, observable behaviors. If examples are concrete but items remain generic, the `CRITICAL RULE — DOMAIN SPECIFICITY` block in the Phase 3 prompt is the lever — it uses the actual domain text as a concrete example of what specific vs. generic looks like.
 
 **Brackets appearing in `example_behavior` column**  
 The Phase 1 LLM wrapped its output in `[]`. The `clean_text` function in Section 0 strips these — ensure the current version of Section 0 is running.
 
 ---
 
-### Phase 4
+### Phase 3
 
 **All items showing FK grade 0**  
 `textstat` is not installed. Run `pip install textstat`, restart the kernel, re-run Section 0.
@@ -631,13 +592,13 @@ It is not frozen. The `tqdm` progress bar is being overwritten by LLM simplifica
 
 ---
 
-### Phase 5
+### Phase 4
 
-**Phase 5 stalls partway through**  
-Most likely cause is computer sleep. Re-run the Phase 5 cell — it detects `05_checkpoint.json` and resumes. You will see `Already done: N / Remaining: N`.
+**Phase 4 stalls partway through**  
+Most likely cause is computer sleep. Re-run the Phase 4 cell — it detects `04_checkpoint.json` and resumes. You will see `Already done: N / Remaining: N`.
 
 **Progress bar not updating**  
-HTTP log messages are flooding the output. Add to the top of the Phase 5 cell:
+HTTP log messages are flooding the output. Add to the top of the Phase 4 cell:
 
 ```python
 import logging
@@ -648,10 +609,10 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 **Many items failing CV for one scale**  
 Check `cv_majority_mapped_scale` — consistent mapping to a different scale indicates genuine semantic overlap. Revise `discriminant_description` fields for both scales in `scales.json` and re-run.
 
-**Reset the checkpoint to start Phase 5 from scratch:**
+**Reset the checkpoint to start Phase 4 from scratch:**
 
 ```python
-checkpoint = BASE_OUTPUT_DIR / "05_checkpoint.json"
+checkpoint = BASE_OUTPUT_DIR / "04_checkpoint.json"
 if checkpoint.exists():
     checkpoint.unlink()
     print("✓ Checkpoint deleted")
@@ -659,15 +620,15 @@ if checkpoint.exists():
 
 ---
 
-### Phase 6
+### Phase 5
 
 **`OSError: [WinError 1114] A dynamic link library (DLL) initialization routine failed`**  
-PyTorch and CUDA versions are mismatched. This is the most common Phase 6 error.
+PyTorch and CUDA versions are mismatched. This is the most common Phase 5 error.
 
 1. Run `nvidia-smi` to check your CUDA version
 2. Reinstall PyTorch with the matching command from Section 6.2
 3. **Restart the Jupyter kernel** (Kernel → Restart) — this step is essential
-4. Re-run Section 0, then Phase 6
+4. Re-run Section 0, then Phase 5
 
 **`ValueError: matmul: Input operand 1 has a mismatch in its core dimension`**  
 The two transformer models produce different embedding dimensions and cannot be averaged as raw vectors. Ensure `encode_macro_aggregate` averages item-to-scale cosine similarities per model (scalars) rather than raw embedding vectors.
@@ -678,21 +639,19 @@ Too few items per scale entered PFA. Check `Pool_Statistics` from Phase 5. Scale
 **`Joint analysis skipped: only N scales`**  
 DAAL and discriminant validity require at least 3 scales. If running fewer scales this is expected and per-scale PFA still runs normally.
 
-**Phase 6 running very slowly**  
+**Phase 5 running very slowly**  
 Run `torch.cuda.is_available()` in a new cell. If `False`, the transformer is on CPU. Reinstall PyTorch with CUDA support (Section 6.2).
 
 ---
 
-### Phase 7
-
 **`Review_Pool` is empty**  
-Every item failed PFA or CV, or `human_review_pass` was set to `False` for all items. Check the Phase 6 output to diagnose. Most common cause is pass thresholds set too high relative to item count.
+Every item failed PFA or CV, or `human_review_pass` was set to `False` for all items. Check the Phase 5 output to diagnose. Most common cause is pass thresholds set too high relative to item count.
 
 **`KeyError` referencing a column name**  
-Phase 6 was run with an older version of the code. Re-run Phase 6 with the current code.
+Phase 5 was run with an older version of the code. Re-run Phase 5 with the current code.
 
 **Pool_Statistics shows very uneven difficulty distribution**  
-Behavioural examples from Phase 1 may have been concentrated at one occurrence level. Re-run Phase 1 with a higher `examples_per_construct` to get more balanced coverage.
+Behavioral examples from Phase 1 may have been concentrated at one occurrence level. Re-run Phase 1 with a higher `examples_per_construct` to get more balanced coverage.
 
 ---
 
@@ -702,29 +661,33 @@ Behavioural examples from Phase 1 may have been concentrated at one occurrence l
 
 **API key** — a private credential identifying you to an API service. Stored in `.env`. Never share it.
 
-**Atomic encoding** — an embedding strategy where each item is encoded individually. The pipeline averages atomic cosine similarity matrices across two transformer models before factor analysis.
+**Atomic encoding** — an embedding strategy where each item is encoded individually. The pipeline averages atomic cosine similarity matrices across all configured transformer models before factor analysis.
 
-**Checkpoint** — a progress save file created by Phase 5 every 100 items (`output/05_checkpoint.json`). Enables automatic resume after interruption.
+**Checkpoint** — a progress save file created by Phase 5 every 100 items (`output/04_checkpoint.json`). Enables automatic resume after interruption.
 
 **Communality** — in factor analysis, the proportion of an item's variance explained by the common factor. Used in Rule 3 of the PFA pass criteria.
 
 **Construct** — a psychological attribute being measured (e.g., Conscientiousness, Resilience, Openness to Experience).
 
-**Content validity** — the degree to which items genuinely represent the intended construct, as judged by subject matter experts.
+**Content validity** — the degree to which items genuinely represent the intended construct, as judged by subject matter experts. Assessed in Phase 4 via c-value (correspondence) and d-value (distinctiveness) indices.
+
+**c-value (Correspondence)** — a content validity index representing how well an item corresponds to its intended construct, computed as the average SME rating normalized to 0–1. Values ≥ 0.88 indicate strong correspondence (Colquitt et al., 2019).
 
 **CUDA** — NVIDIA's GPU computing framework. The CUDA version must match between your GPU driver and PyTorch installation.
 
-**DAAL (Dominant Average Absolute Loading)** — the method used to confirm factor identity in the joint multi-scale PFA. For each extracted factor, the mean absolute loading of each scale's items on that factor is computed. The scale with the highest such value — the dominant average absolute loading — is assigned as the factor's label. A scale's DAAL identity is confirmed if the factor labelled with its name is also the factor on which that scale's items load most strongly. Where two scales produce equal dominant values on the same factor, neither can be uniquely assigned and the factor is labelled Unassigned.
+**DAAL (Dominant Average Absolute Loading)** — the method used to confirm factor identity in the joint multi-scale PFA. For each extracted factor, the mean absolute loading of each scale's items on that factor is computed. The scale with the highest such value — the dominant average absolute loading — is assigned as the factor's label. A scale's DAAL identity is confirmed if the factor labeled with its name is also the factor on which that scale's items load most strongly. Where two scales produce equal dominant values on the same factor, neither can be uniquely assigned and the factor is labeled Unassigned.
 
-**Discriminant validity** — evidence that a measure of construct A is sufficiently different from a measure of construct B. Assessed in Phase 6 by comparing each item's target factor loading to its maximum cross-loading.
+**d-value (Distinctiveness)** — a content validity index representing how clearly an item separates from non-target constructs, computed as the mean difference between target and orbiting ratings normalized by the scale range. Values ≥ 0.35 indicate adequate distinctiveness (Colquitt et al., 2019).
+
+**Discriminant validity** — evidence that a measure of construct A is sufficiently different from a measure of construct B. Assessed in Phase 5 by comparing each item's target factor loading to its maximum cross-loading.
 
 **Embedding** — a numerical vector representation of text produced by a language model. The pipeline uses embeddings to compute semantic similarity between items and between items and scales.
 
-**Factor analysis** — a statistical technique identifying underlying patterns in a correlation matrix. Phase 6 applies it to AI-generated similarity matrices rather than human response data.
+**Factor analysis** — a statistical technique identifying underlying patterns in a correlation matrix. Phase 5 applies it to AI-generated similarity matrices rather than human response data.
 
 **Flesch-Kincaid grade** — a readability score expressed as a US school grade level. Grade 8 means a typical 13–14-year-old can read the text. The pipeline's primary readability metric.
 
-**GPU (Graphics Processing Unit)** — used for AI computation in Phase 6. Significantly faster than CPU for transformer encoding.
+**GPU (Graphics Processing Unit)** — used for AI computation in Phase 5. Significantly faster than CPU for transformer encoding.
 
 **HEXACO** — a six-factor personality model: Honesty-Humility, Emotionality, Extraversion, Agreeableness, Conscientiousness, and Openness to Experience (Ashton & Lee, 2007).
 
@@ -742,17 +705,17 @@ Behavioural examples from Phase 1 may have been concentrated at one occurrence l
 
 **PFA (Pseudo-Factor Analysis)** — factor analysis applied to a matrix of AI-generated embedding similarity scores between items, rather than to a matrix of empirical correlations from human responses. Theoretical basis is the substitutability assumption.
 
-**RMSR (Root Mean Square Residual)** — the only model fit metric computed in Phase 6. Measures the average size of unexplained correlations after the factor model is applied. Values below 0.08 indicate acceptable fit; below 0.05 indicates good fit. CFI, TLI, and RMSEA are not computed as they require sample size.
+**RMSR (Root Mean Square Residual)** — the only model fit metric computed in Phase 5. Measures the average size of unexplained correlations after the factor model is applied. Values below 0.08 indicate acceptable fit; below 0.05 indicates good fit. CFI, TLI, and RMSEA are not computed as they require sample size.
 
-**Scale mapping agreement** — the proportion of Phase 5 SMEs who correctly identified the target scale for an item. Values below 0.6 cause an item to fail content validity.
+**Scale mapping agreement** — the proportion of Phase 4 SMEs whose highest-rated scale matches the target scale for an item. Retained as a diagnostic metric alongside c-value and d-value.
 
-**Sentence transformer** — a class of language model producing semantically meaningful sentence embeddings. The pipeline uses `all-MiniLM-L6-v2` (primary) and `all-mpnet-base-v2`.
+**Sentence transformer** — a class of language model producing semantically meaningful sentence embeddings. The pipeline uses one or more models configured in `pipeline_settings.json`; the default is `all-MiniLM-L6-v2`.
 
 **SME (Subject Matter Expert)** — in Phase 5, five LLM models play the role of independent SMEs rating item quality.
 
 **Substitutability assumption** — the theoretical basis for PFA: that an item's embedding vector can substitute for an empirical response vector during early-stage scale development (Guenole et al., 2025).
 
-**Tucker's congruence coefficient** — a measure of similarity between two factor loading vectors. Values ≥ 0.95 indicate excellent equivalence; ≥ 0.85 indicates fair similarity (Lorenzo-Seva & ten Berge, 2006). Used in Phase 6 to compare atomic and macro encoding solutions per scale.
+**Tucker's congruence coefficient** — a measure of similarity between two factor loading vectors. Values ≥ 0.95 indicate excellent equivalence; ≥ 0.85 indicates fair similarity (Lorenzo-Seva & ten Berge, 2006). Used in Phase 5 to compare atomic and macro encoding solutions per scale.
 
 ---
 
