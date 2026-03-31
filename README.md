@@ -52,15 +52,16 @@ The architecture draws directly on the following published work:
 
 > Guenole, N., Samo, A., & Sun, T. (2024). *Pseudo-discrimination parameters from language embeddings*. Open Science Framework. https://doi.org/10.31234/osf.io/9a4qx
 
-> Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. B. (2025). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices*. Manuscript in preparation.
+> Guenole, N., D’Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices.*
 
-> Suárez-Álvarez, J., Fernández-Alonso, R., & Muñiz, J. (2026). Evaluating pseudo-factor analysis as a tool for item selection in psychological test development. *Psicothema*, *38*(1), 1–12.
+> Suárez-Álvarez, J., He, Q., Guenole, N., & D’Urso, D. (2026). Using Artificial Intelligence in Test Construction: A Practical Guide. *Psicothema*, *38*(1), 1-12.
 
 > Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168.
 
-> Lee, J. Y., Li, Y., & Rounds, J. (2025). *AI-powered item generation for psychological tests*. Manuscript submitted for publication.
+> Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1-29.
 
-> Lee, J. Y., Joo, S. H., Antonakis, J., & Rounds, J. (2025). The journey of forced-choice measurement over 80 years: Past, present, and future. *Annual Review of Organizational Psychology and Organizational Behavior*, *12*, 1–30.
+> Lee, P., Son, M., Zhou, S., Joo, S., Jia, Z., & Cheng, V. (2025). The journey of forced choice measurement over 80 years: Past, present, and future. *Organizational Research Methods*, *28*(4), 680-722.
+
 
 ---
 
