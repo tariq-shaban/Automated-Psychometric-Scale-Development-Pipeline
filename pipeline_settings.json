@@ -20,8 +20,8 @@
     "response_format": "likert_5"
   },
   "phase_01_behavioral_domains": {
-    "_comment": "Behavioral domain generation AND validation in a single phase. Generates observable behavioral examples then validates each against construct, face, and discriminant validity. LEVEL = likelihood of occurrence in target environment, not item difficulty.",
-    "examples_per_construct": 5,
+    "_comment": "Behavioral domain generation AND validation in a single phase. Generates observable behavioral examples then validates each against construct, face, and discriminant validity. LEVEL = likelihood of occurrence in target environment, not item extremity.",
+    "examples_per_construct": 3,
     "output_file": "01_behavioral_domains.xlsx",
     "generation_model": "anthropic/claude-haiku-4.5",
     "generation_max_tokens": 1500,
@@ -76,10 +76,10 @@
     "max_tokens": 2000,
     "temperature": 0.8,
     "retry_attempts": 3,
-    "items_per_difficulty": {
-      "high": 10,
-      "moderate": 0,
-      "low": 10
+    "items_per_location": {
+        "high_location": 5,
+        "central": 0,
+        "low_location": 0
     },
     "inter_example_delay_seconds": 1,
     "duplicate_removal_threshold": 0.85,
@@ -107,58 +107,38 @@
     }
   },
   "phase_03_readability_bias": {
-    "_comment": "Readability analysis and bias detection",
-    "output_file": "03_readability_bias.xlsx",
-    "reading_level_target": 8,
-    "max_simplification_attempts": 3,
-    "reading_level_hard_cap": 12,
-    "simplification_model": "anthropic/claude-haiku-4.5",
-    "simplification_max_tokens": 150,
-    "simplification_temperature": 0.3,
-    "readability_metrics": [
-      "flesch_kincaid_grade",
-      "flesch_reading_ease",
-      "gunning_fog",
-      "coleman_liau_index",
-      "smog_index",
-      "automated_readability_index"
+  "_comment": "Readability analysis, LLM simplification, and LLM bias review. Bias is evaluated by multiple LLM reviewers using a structured rubric aligned with Zieky (2013) and Lee et al. (2025).",
+  "output_file": "03_readability_bias.xlsx",
+  "reading_level_target": 8,
+  "reading_level_hard_cap": 12,
+  "max_simplification_attempts": 3,
+  "simplification_model": "anthropic/claude-haiku-4.5",
+  "simplification_max_tokens": 150,
+  "simplification_temperature": 0.3,
+  "readability_metrics": [
+    "flesch_kincaid_grade", "flesch_reading_ease", "gunning_fog",
+    "coleman_liau_index", "smog_index", "automated_readability_index"
+  ],
+  "bias_review": {
+    "models": [
+      "anthropic/claude-haiku-4.5",
+      "openai/gpt-4o"
     ],
-    "bias_categories": [
+    "max_tokens": 400,
+    "temperature": 0.1,
+    "retry_attempts": 3,
+    "dimensions": [
       "gender",
+      "ethnicity_race",
       "age",
-      "cultural",
-      "socioeconomic"
+      "religion_culture",
+      "socioeconomic",
+      "sexual_orientation_disability"
     ],
-    "pass_rules": {
-      "readability_hard_cap": {
-        "description": "Items still above reading_level_hard_cap after all simplification attempts are flagged system_readability_pass=False",
-        "threshold": 12,
-        "field": "flesch_kincaid_grade",
-        "operator": "<="
-      },
-      "readability_soft_target": {
-        "description": "Items above reading_level_target (but below hard cap) are flagged above_reading_target=True for human review",
-        "threshold": 8,
-        "field": "flesch_kincaid_grade",
-        "operator": "<="
-      },
-      "bias_flag": {
-        "description": "Items matching bias patterns are flagged in bias_flags \u2014 not auto-excluded; human review required",
-        "categories": [
-          "gender",
-          "age",
-          "cultural",
-          "socioeconomic"
-        ],
-        "flag_only": true
-      }
-    },
-    "human_review_columns": {
-      "system_readability_pass": "System-set Boolean. False only if item remains above hard cap after all simplification attempts.",
-      "human_review_pass": "Boolean. Default True. Override system result. Phase 4 reads this column.",
-      "human_comments": "Free text. Required for any accepted bias-flagged item."
-    }
-  },
+    "flag_threshold": 3.5,
+    "max_workers": 3
+  }
+},
   "phase_04_content_validity": {
     "_comment": "Multi-LLM SME content validity review using correspondence (c-value) and distinctiveness (d-value) indices following Hinkin & Tracey (1999) as operationalized by Colquitt et al. (2019) and implemented in the LM-AIG framework (Lee, Son, & Jia, 2025).",
     "output_file": "04_content_validity.xlsx",
@@ -174,8 +154,8 @@
         "role": "sme"
       },
       "sme3": {
-        "provider": "google",
-        "model_id": "google/gemini-2.0-flash-001",
+        "provider": "meta",
+        "model_id": "meta-llama/llama-3.3-70b-instruct",
         "role": "sme"
       },
       "sme4": {
@@ -247,13 +227,13 @@
         "threshold": 0.35,
         "operator": "<"
       },
-      "Rule_5_Cross_Difficulty_Viable": {
+      "Rule_5_Cross_Extremity_Viable": {
         "description": "All-items loading >= 0.20",
         "threshold": 0.2,
         "operator": ">="
       },
-      "Rule_6_Within_Difficulty_Viable": {
-        "description": "Within-difficulty loading >= 0.25",
+      "Rule_6_Within_Extremity_Viable": {
+        "description": "Within-extremity loading >= 0.25",
         "threshold": 0.25,
         "operator": ">="
       }
@@ -281,12 +261,12 @@
       "min_d_value": 0.35
     },
     "combined_pass_logic": "must_pass_pfa AND must_pass_cv",
-    "final_pool_target_per_difficulty": 20,
+    "final_pool_target_per_extremity": 20,
     "include_columns": [
       "item_id",
       "scale_name",
       "item_text",
-      "difficulty_target",
+      "extremity_target",
       "source_example",
       "occurrence_likelihood",
       "flesch_kincaid_grade",
@@ -313,8 +293,8 @@
       "Rule_2_Adequate_Single_Factor",
       "Rule_3_Adequate_Communality",
       "Rule_4_Clean_Factor_Structure",
-      "Rule_5_Cross_Difficulty_Viable",
-      "Rule_6_Within_Difficulty_Viable",
+      "Rule_5_Cross_Extremity_Viable",
+      "Rule_6_Within_Extremity_Viable",
       "overall_pass",
       "human_review_pass",
       "human_comments",

@@ -1,9 +1,10 @@
 # Automated Psychometric Scale Development Pipeline
 
-**Author:** Tariq Shaban — Inubilum Ltd  
+**Author:** Tariq Shaban — Miraai Ltd  
 **Version:** Revised March 2026  
 **Origin:** Originally developed under the name Project Majdal  
-**Contact:** [tariq@inubilum.io](mailto:tariq@inubilum.io) · [GitHub](https://github.com/tariq-shaban) · [LinkedIn](https://www.linkedin.com/in/tariq-shaban-0090ba2/)
+**Contact:** [tariq@miraai.me](mailto:tariq@miraai.me) · [GitHub](https://github.com/tariq-shaban) · [LinkedIn](https://www.linkedin.com/in/tariq-shaban-0090ba2/)
+**Reviewed by** Dr. Philseok Lee — George Mason University
 ---
 
 ## Table of Contents
@@ -46,7 +47,7 @@ This pipeline produces a **pre-trial item pool**, not a finished assessment. Rea
 
 ## 2. Background and Academic Basis
 
-This pipeline was originally conceived and developed as **Project Majdal** by Tariq Shaban (Inubilum Ltd) as a practical implementation of emerging methods in AI-assisted psychometric scale development.
+This pipeline was originally conceived and developed as **Project Majdal** by Tariq Shaban (Miraai Ltd) as a practical implementation of emerging methods in AI-assisted psychometric scale development.
 
 The architecture draws directly on the following published work:
 
@@ -722,22 +723,23 @@ Behavioral examples from Phase 1 may have been concentrated at one occurrence le
 
 ## 13. References
 
-Guenole, N., Samo, A., Campion, J. K., Meade, A., Sun, T., & Oswald, F. (2024, February). *Pseudo-discrimination parameters from language embeddings*. Presented February 2024.
+> Guenole, N., Samo, A., & Sun, T. (2024). *Pseudo-discrimination parameters from language embeddings*. Open Science Framework. https://doi.org/10.31234/osf.io/9a4qx
 
-Guenole, N., D’Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices.
+> Guenole, N., D’Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices.*
 
-Suárez-Álvarez, J., Fernández-Alonso, R., & Muñiz, J. (2026). Evaluating pseudo-factor analysis as a tool for item selection in psychological test development. *Psicothema*, *38*(1), 1–12.
+> Suárez-Álvarez, J., He, Q., Guenole, N., & D’Urso, D. (2026). Using Artificial Intelligence in Test Construction: A Practical Guide. *Psicothema*, *38*(1), 1-12.
 
-Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168. https://doi.org/10.1016/j.crbeha.2025.100168
+> Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168.
 
-Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1–29.
+> Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1-29.
 
-Lee, J. Y., Joo, S. H., Antonakis, J., & Rounds, J. (2025). The journey of forced-choice measurement over 80 years: Past, present, and future. *Annual Review of Organizational Psychology and Organizational Behavior*, *12*, 1–30. https://doi.org/10.1146/annurev-orgpsych-021124-055748
+> Lee, P., Son, M., Zhou, S., Joo, S., Jia, Z., & Cheng, V. (2025). The journey of forced choice measurement over 80 years: Past, present, and future. *Organizational Research Methods*, *28*(4), 680-722.
 
-Lorenzo-Seva, U., & ten Berge, J. M. F. (2006). Tucker's congruence coefficient as a meaningful index of factor similarity. *Methodology: European Journal of Research Methods for the Behavioral and Social Sciences*, *2*(2), 57–64. https://doi.org/10.1027/1614-2241.2.2.57
+> Lorenzo-Seva, U., & ten Berge, J. M. F. (2006). Tucker's congruence coefficient as a meaningful index of factor similarity. *Methodology: European Journal of Research Methods for the Behavioral and Social Sciences*, *2*(2), 57–64. https://doi.org/10.1027/1614-2241.2.2.57
 
 ---
 
-*Automated Psychometric Scale Development Pipeline — Inubilum Ltd.*  
+*Automated Psychometric Scale Development Pipeline — Miraai Ltd.*  
 *Pipeline version: Revised March 2026*  
-*Author: Tariq Shaban*
+*Author: Tariq Shaban — Miraai Ltd*
+*Reviewed by Dr. Philseok Lee — George Mason University*
