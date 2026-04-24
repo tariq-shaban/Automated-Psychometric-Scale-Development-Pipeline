@@ -74,7 +74,7 @@ The pipeline is a single Jupyter Notebook. Each phase reads the output of the pr
 scales.json (input)
     │
     ├── PHASE 1 │ Behavioral Domain Generation and Validation → 01_behavioral_domains.xlsx
-    ├── PHASE 2 │ Item Generation (GGUM / Ideal Point)        → 02_generated_items.xlsx
+    ├── PHASE 2 │ Item Generation (dominance items)           → 02_generated_items.xlsx
     ├── PHASE 3 │ Readability & LLM Bias Review               → 03_readability_bias.xlsx
     ├── PHASE 4 │ Content Validity (LLM SMEs)                 → 04_content_validity.xlsx
     └── PHASE 5 │ Pseudo-Factor Analysis and Final Review     → 05_pseudo_factor_analysis.xlsx
@@ -82,9 +82,14 @@ scales.json (input)
 
 **Phase 1** reads your construct definitions from `scales.json`, generates observable behavioral examples — recurring patterns of behavior that someone with this trait would exhibit in the target environment — and then validates each example against three criteria: construct validity, face validity, and discriminant validity. Failed examples are flagged and excluded from item writing by default. The `occurrence_likelihood` field (low / moderate / high) reflects how frequently the behavior appears in context, not item difficulty.
 
-**Phase 2** turns validated behavioral examples into survey items — first-person "I" statements calibrated to specific locations on the trait continuum, following the Generalized Graded Unfolding Model (GGUM) ideal point framework. Items are generated at three location levels — `high_location`, `central`, and `low_location` — representing where on the trait continuum each item's endorsement probability peaks. High-location items express intense, effortful behaviors endorsed mainly by high scorers; central items express typical everyday behaviors endorsed most strongly by moderate scorers; low-location items express minimal or avoidance behaviors endorsed mainly by low scorers. Each item is tightly anchored to its source behavioral domain to prevent the generic cross-domain duplication that occurs when items reflect the construct in general rather than a specific behavior.
+**Phase 2** turns validated behavioral examples into survey items — first-person "I" statements written as **standard dominance items** (the standard Likert format: higher trait = stronger endorsement). Items are stratified by keying direction (`item_keying`) rather than by location on a trait continuum:
 
-**Phase 3** computes six readability metrics per item. Items above the reading level hard cap are simplified automatically by LLM, preserving the original wording in `original_item_text`. Low-location items retain their negations during simplification. Bias screening is conducted by three independent LLM reviewers who rate each item on six dimensions — gender, ethnicity and race, age, religion and culture, socioeconomic, and sexual orientation and disability — on a 1–5 scale. Items with a mean reviewer rating below 3.5 on any dimension are flagged for human review but not automatically excluded. This approach is grounded in Zieky (2013) and aligned with the bias reviewer agent framework of Lee, Son & Jia (2025).
+- **Positively keyed items** — express the high pole of the construct directly; no negations. Higher trait = stronger endorsement.
+- **Negatively keyed items** — genuine semantic reversals. These describe the opposite or absence of the construct, not low-intensity versions of the positive items. Negations and reversal language (`rarely`, `never`, `seldom`, `avoid`) are permitted and expected.
+
+A roughly 2:1 positive-to-negative ratio is recommended to control acquiescence bias (Clark & Watson, 1995; DeVellis, 2017) without inflating the method-factor variance that too many negatively keyed items can introduce. The ratio is configurable via `items_per_keying`. Each item is tightly anchored to its source behavioral domain to prevent the generic cross-domain duplication that occurs when items reflect the construct in general rather than a specific behavior.
+
+**Phase 3** computes six readability metrics per item. Items above the reading level hard cap are simplified automatically by LLM, preserving the original wording in `original_item_text`. Critically, **negatively keyed items must retain their negations and reversal language during simplification** — stripping a `rarely` or `don't` would flip the item's semantic direction. Bias screening is conducted by multiple independent LLM reviewers who rate each item on six dimensions — gender, ethnicity and race, age, religion and culture, socioeconomic, and sexual orientation and disability — on a 1–5 scale. Items with a mean reviewer rating below 3.5 on any dimension are flagged for human review but not automatically excluded. This approach is grounded in Zieky (2013) and aligned with the bias reviewer agent framework of Lee, Son & Jia (2025).
 
 **Phase 4** has five LLM models acting as independent subject matter experts. Each rates the item's correspondence with every scale in the assessment on a 1–7 Likert scale. Two content validity indices are computed per item following Hinkin and Tracey (1999) and Colquitt et al. (2019): the **c-value** (correspondence — how well the item measures the target construct, computed as mean target rating / 7) and the **d-value** (distinctiveness — how clearly it separates from non-target constructs, computed as mean(target − orbiting) / 6). Items only proceed if they clear both c-value ≥ 0.88 and d-value ≥ 0.35.
 
@@ -103,7 +108,9 @@ Every phase that applies automated pass/fail logic also writes two columns to it
 
 The rule is: **the next phase always reads `human_review_pass` from the previous phase's output.** The filter uses `!= False`, which means items where the value is `True` or blank both pass through — only an explicit `False` excludes an item. Setting a value to `False` excludes that item from all subsequent phases. Setting it to `True` on an item the system failed reinstates it.
 
-After running any phase, open the output Excel, review the results, make changes in `human_review_pass`, save the file, and run the next phase — which will automatically respect your decisions.
+**Edits to `item_text` are carried forward too.** Each phase reloads the items it processes from the previous phase's Excel output. If you reword an item in `item_text` (for example, fixing awkward wording on a negatively keyed item in `02_generated_items.xlsx`), the reworded version is what Phase 3 reads, measures, screens for bias, and passes on to Phase 4. The same applies at every phase boundary. This means you can iterate on item wording in-place in Excel and simply re-run the next phase — no code changes, no exporting back to JSON.
+
+After running any phase, open the output Excel, review the results, edit `item_text` or set `human_review_pass = False` where needed, save the file, and run the next phase — which will automatically respect your decisions.
 
 ---
 
@@ -215,7 +222,7 @@ Do not open the notebook by double-clicking it directly. The working directory w
 
 The pipeline reads construct definitions from `scales.json`. This is the most important configuration step — the quality of your construct definitions determines the quality of everything the pipeline produces.
 
-### Required fields
+### Required fields per scale
 
 ```json
 {
@@ -224,7 +231,16 @@ The pipeline reads construct definitions from `scales.json`. This is the most im
   "high_anchor": "Works in an organized and systematic way...",
   "low_anchor": "Approaches tasks in an unsystematic way...",
   "measure_type": "Trait",
-  "discriminant_description": "Conscientiousness concerns self-regulation, not moral conduct...",
+  "discriminant_description": "Conscientiousness concerns self-regulation, not moral conduct..."
+}
+```
+
+### Population, environment, and response format live in `pipeline_settings.json`
+
+The `target_population`, `target_environment`, `reading_level_target`, and `response_format` fields are **not** configured per scale. They live in the `scale_defaults` block of `pipeline_settings.json` and apply uniformly to every scale in the run:
+
+```json
+"scale_defaults": {
   "target_population": {
     "age_range": "18-65",
     "education_level": "High school graduates or above",
@@ -236,6 +252,8 @@ The pipeline reads construct definitions from `scales.json`. This is the most im
   "response_format": "likert_5"
 }
 ```
+
+Edit these values once before your run — they propagate to every scale automatically through Section 0's `normalise_scale` function. If you genuinely need a per-scale override for one of these fields (e.g., a scale targeting lower-literacy respondents should use a lower `reading_level_target`), you can still add the field to that scale's entry in `scales.json` and it will take precedence over the default for that scale only.
 
 ### Writing effective construct definitions
 
@@ -276,7 +294,7 @@ Run phases strictly in order: 1 → 2 → 3 → 4 → 5. Each phase reads the pr
 
 ### Approximate run times
 
-For approximately 24 scales, 5 behavioral examples per scale, 5 items per location level (600 items entering Phase 5), with a GPU:
+For approximately 24 scales, 5 behavioral examples per scale, 15 items per behavioral example (10 positively + 5 negatively keyed; ~1,800 items entering Phase 5), with a GPU:
 
 | Phase | Approximate time | Bottleneck |
 |---|---|---|
@@ -322,26 +340,31 @@ For each construct, the LLM generates observable behavioral examples — recurri
 **Input:** `01_behavioral_domains.xlsx` (respects `human_review_pass`)  
 **Output:** `02_generated_items.xlsx`
 
-Survey items are generated from validated behavioral examples, calibrated to three locations on the trait continuum following the Generalized Graded Unfolding Model (GGUM) ideal point framework. Each item is written so its natural endorsement probability peaks at the specified continuum location — this is `item_location_target` in the output.
+Survey items are generated from validated behavioral examples as **standard dominance items** — the Likert format used in almost every operational personality inventory (IPIP-NEO-300, IPIP-HEXACO-240, Big Five Inventory, DASS, RIASEC, HSQ) and the format on which the PFA validation literature was developed (Guenole et al., 2025; Milano et al., 2025; Suárez-Álvarez et al., 2026).
 
-| Location level | Description | Negations |
+Items are stratified by **keying direction** (`item_keying`) rather than by location on a trait continuum:
+
+| Keying | Description | Negations |
 |---|---|---|
-| `high_location` | Intense, effortful expressions endorsed mainly by genuinely high scorers | Not permitted |
-| `central` | Typical everyday expressions endorsed most strongly by moderate scorers | Not permitted |
-| `low_location` | Minimal or avoidance expressions endorsed mainly by genuinely low scorers | Permitted |
+| `positive` | Standard monotone dominance items — higher trait = stronger endorsement. Express the high pole of the construct behaviorally. | Not permitted |
+| `negative` | Genuine semantic reversals — lower trait = stronger endorsement. Express the opposite or absence of the construct. Not the same as low-intensity positives. | Permitted and expected |
 
-Each item must be tightly anchored to its specific source behavioral domain — not to the construct in general. Near-duplicate items are detected by TF-IDF cosine similarity and flagged (not removed) so a reviewer can choose which to keep.
+A negatively keyed item is a **true reversal**, not a mild form of the positive item. For Conscientiousness: `"I often look for ways around workplace rules"` is negatively keyed; `"I sometimes forget workplace rules"` is a low-intensity positive and would fail the prompt's reversal criterion.
 
-**What to review:** Check `Generation_Summary` for item counts by location level. Review items flagged `duplicate_flag = True` as pairs — keep the one more tightly anchored to its domain. Items that seem too generic or applicable to multiple domains should be excluded via `human_review_pass = False`. Verify that low-location items sound like neutral habit statements rather than admissions of failure — they should not carry a socially undesirable tone.
+**Keying ratio.** The default `items_per_keying` is `{"positive": 10, "negative": 5}` — a 2:1 ratio. Negatively keyed items are needed to detect acquiescence bias (Clark & Watson, 1995; DeVellis, 2017), but too many can introduce a method factor. The 2:1 default is a conservative balance. Set either value to 0 to skip that direction.
 
-**Human review columns added:** `duplicate_flag`, `duplicate_of`, `duplicate_similarity` (system-set), `human_review_pass` (default `True`), `human_comments`. Phase 3 reads `human_review_pass`.
+Each item must be tightly anchored to its specific source behavioral domain — not to the construct in general. Near-duplicate items are detected by TF-IDF cosine similarity and flagged (not removed) **separately within each keying direction**, because a positive item and its intentional negative counterpart will legitimately look similar on a lexical measure.
+
+**What to review:** Check `Generation_Summary` for item counts by scale and keying direction. Review items flagged `duplicate_flag = True` as pairs — keep the one more tightly anchored to its domain. Verify that negatively keyed items sound like genuine reversals rather than mild positives, and that positively keyed items don't sound like obviously virtuous answers. Items that seem too generic should be excluded via `human_review_pass = False`. **Edits you make to `item_text` are carried forward automatically.**
+
+**Human review columns added:** `item_keying` (system-set), `duplicate_flag`, `duplicate_of`, `duplicate_similarity` (system-set), `human_review_pass` (default `True`), `human_comments`. Phase 3 reads `human_review_pass` and carries forward any edits to `item_text`.
 
 **Key settings:**
 
 | Setting | Default | Notes |
 |---|---|---|
-| `items_per_location` | `{"high_location": 5, "central": 5, "low_location": 5}` | Set to 0 to skip a level |
-| `duplicate_removal_threshold` | 0.85 | Cosine similarity threshold for flagging |
+| `items_per_keying` | `{"positive": 10, "negative": 5}` | Set either to 0 to skip that direction |
+| `duplicate_removal_threshold` | 0.85 | Cosine similarity threshold for flagging within each keying direction |
 | `temperature` | 0.8 | Higher = more lexical variety |
 
 ---
@@ -352,7 +375,7 @@ Each item must be tightly anchored to its specific source behavioral domain — 
 **Output:** `03_readability_bias.xlsx`  
 **Sheets:** `Items_With_Readability`, `Readability_Summary`, `Bias_Summary`, `Bias_Detail`, `Simplified_Items_Log`
 
-Six readability metrics are computed per item. Items above `reading_level_hard_cap` are simplified by LLM (up to `max_simplification_attempts` times). The original wording is preserved in `original_item_text`. Low-location items retain their negations during simplification.
+Six readability metrics are computed per item. Items above `reading_level_hard_cap` are simplified by LLM (up to `max_simplification_attempts` times). The original wording is preserved in `original_item_text`. **Negatively keyed items (`item_keying = negative`) must retain their negations and reversal language during simplification** — stripping a `rarely` or `don't` would flip the item's semantic direction. The simplification prompt enforces this keying-aware rule automatically.
 
 Bias screening replaces simple pattern matching with structured multi-model evaluation. Three LLM reviewers independently rate each item on six bias dimensions using a 1–5 scale (1 = highly biased, 5 = completely unbiased):
 
@@ -400,9 +423,19 @@ Progress is checkpointed every 100 items. If Phase 4 is interrupted, re-run the 
 
 Phase 5 is the statistical core and final review stage. Sentence transformer embeddings serve as a semantic proxy for item inter-correlations, and factor analysis is applied to the resulting similarity matrices — Pseudo-Factor Analysis (Guenole et al., 2025). One or more sentence transformer models can be specified in `pipeline_settings.json` under `transformer_models`. If multiple models are listed, their cosine similarity matrices are averaged before factor analysis, following Guenole et al. (2025). The default is `all-MiniLM-L6-v2`.
 
-**Negative item reversal for embedding**
+**Flag-driven reversal for embedding**
 
-Items describing the absence or avoidance of the construct (e.g., "I rarely plan ahead") are detected via heuristic pattern matching followed by an LLM call for borderline cases, and rewritten to their positive pole for embedding only. The original `item_text` is always preserved. Reversed items are flagged in `item_reversed_for_embedding`.
+In the dominance framework the keying direction of every item is already known from Phase 2 (`item_keying = positive` or `item_keying = negative`). Under the `atomic_reversed` encoding strategy, negatively keyed items are paraphrased to their positive-pole equivalents for embedding only — this is triggered deterministically by the keying flag with no heuristic detection step. The LLM is called only to perform the paraphrase. The original `item_text` is always preserved. Whether reversal was applied to a given item under the chosen primary encoding is recorded in `item_reversed_for_embedding`.
+
+**Encoding strategy — atomic vs atomic-reversed (Guenole et al., 2025)**
+
+Two strategies are supported, configurable via `encoding_strategy`:
+
+- **`atomic`** — every item is embedded exactly as written. Best-performing on HEXACO in Guenole et al. (2025) (98% factor recovery).
+- **`atomic_reversed`** — negatively keyed items are paraphrased to their positive-pole equivalents before embedding. Best-performing on NEO in Guenole et al. (2025) (94% factor recovery vs. 71% for standard atomic).
+- **`both`** — runs both strategies and reports per-strategy loadings. The primary strategy (first in the run list) drives pass-rule evaluation; the secondary adds parallel columns. Recommended when the instrument's framework is unknown.
+
+The `encoding_strategy_primary` column on every item records which strategy produced that item's pass-rule loadings.
 
 **Six pass/fail rules**
 
@@ -410,12 +443,12 @@ Items describing the absence or avoidance of the construct (e.g., "I rarely plan
 |---|---|---|
 | Rule 1 — Strong Single Factor | \|Atomic loading\| ≥ threshold | 0.40 |
 | Rule 2 — Adequate Single Factor | \|Atomic loading\| ≥ threshold | 0.30 |
-| Rule 3 — Adequate Communality | Communality ≥ threshold | 0.15 |
+| Rule 3 — Adequate Communality | Communality ≥ threshold | 0.10 |
 | Rule 4 — Clean Factor Structure | Max secondary loading < threshold | 0.35 |
-| Rule 5 — Cross-Location Viable | \|All-items loading\| ≥ threshold | 0.20 |
-| Rule 6 — Within-Location Viable | \|Within-location loading\| ≥ threshold | 0.25 |
+| Rule 5 — Cross-Sample Viable | \|All-items loading\| ≥ threshold | 0.20 |
+| Rule 6 — Keying-Viable | \|Within-keying loading\| ≥ threshold | 0.25 |
 
-Note: Rules 1, 2, 5, and 6 use absolute values to handle factor sign flips, which are expected in PFA and do not reflect item quality.
+Rule 5 (formerly `Cross_Location_Viable`) checks that the item loads at a usable level on the all-items pooled factor — cross-keying viable. Rule 6 (formerly `Within_Location_Viable`) checks the within-keying stratum — positively keyed items and negatively keyed items are analysed separately so that each item's loading is measured against the factor defined by its own keying direction. Rules 1, 2, 5, and 6 use absolute values to handle factor sign flips, which are expected in PFA and do not reflect item quality.
 
 **HIGH_PASS** requires Rules 1, 3, and 4. **STANDARD_PASS** requires at least `min_rules_to_pass` rules (default 3).
 
@@ -425,35 +458,33 @@ In the joint multi-scale factor analysis, factors are labeled using the Dominant
 
 **Tucker's congruence**
 
-Tucker's congruence coefficient is computed between the atomic and macro loading solutions per scale. Values ≥ 0.95 indicate excellent encoding invariance; ≥ 0.85 indicates fair similarity; < 0.85 suggests the two encoding strategies disagree and the construct definition warrants closer examination (Lorenzo-Seva & ten Berge, 2006). Note that broad, semantically heterogeneous factors (e.g. HEXACO Emotionality) are expected to produce poor Tucker's congruence by design — use the `Item_Scale_Heatmap` (ratio ≥ 2.0) as the primary screening tool for such constructs.
+Earlier versions of this pipeline reported a Tucker's congruence coefficient between the atomic and macro loading solutions per scale. That comparison has been removed. Tucker's congruence as defined by Lorenzo-Seva and ten Berge (2006) is calibrated for comparing two factor loading matrices drawn from the same analytical family — typically an EFA against its cross-validation sample or against published validation loadings (as in Guenole et al., 2025; Milano et al., 2025). Atomic FA loadings and macro item-to-scale cosine similarities do not live in that same comparison space, and the published 0.85 / 0.95 thresholds do not apply. Reporting that comparison as Tucker's was misleading. Encoding-strategy convergence can still be examined directly on the per-strategy loading columns in `PFA_Item_Results` when `encoding_strategy = both`.
 
 **Model fit**
 
-RMSR (Root Mean Square Residual) is the only reported fit metric. CFI, TLI, and RMSEA are not computed — they require a known sample size and are unreliable in PFA contexts (Guenole et al., 2025; Suárez-Álvarez et al., 2026). Values below 0.08 indicate acceptable fit; below 0.05 indicates good fit.
+RMSR (Root Mean Square Residual) is the reported fit metric. Values below 0.08 indicate acceptable fit; below 0.05 indicates good fit.
 
 **Output sheets**
 
 | Sheet | Contents | When to use |
 |---|---|---|
 | `PFA_Item_Results` | Full per-item metrics — loadings, rules, discriminant validity, DAAL | Primary item-level review |
-| `PFA_Scale_Summary` | Scale-level aggregates, DAAL identity, Tucker's congruence, mean c/d-values | Start here |
+| `PFA_Scale_Summary` | Scale-level aggregates, DAAL identity, mean c/d-values | Start here |
 | `Discriminant_Matrix` | Raw FA loadings — all items, all factors in rotation order including Unassigned | Examining precise cross-loading values |
 | `Item_Scale_Heatmap` | Cosine similarity of each item vs each scale in `scales.json` order — all items, no DAAL dependency | Visual inspection of construct specificity; primary screen for heterogeneous factors |
 | `Loading_Matrix_All` | FA loadings as item × scale — all Phase 4 items; non-PFA items have projected loadings | FA-based values across the full item pool |
 | `Loading_Matrix_CV_Pass` | Same, CV-pass items only, all loadings exact | Preferred over Loading_Matrix_All |
 | `Fit_Statistics` | RMSR and residual stats per scale | Check `fit_acceptable` first |
 | `Eigenvalues` | Eigenvalue tables per scale | Assessing dimensionality |
-| `Tucker_Congruence` | Congruence coefficients per scale | Identifying encoding-unstable scales |
 | `High_Pass_Loadings` | HIGH_PASS items only | Quick review of strongest candidates |
 | `All_Pass_Loadings` | All trial-ready items | Overview of passing pool |
 | `Pass_Rules_Definition` | Threshold documentation | Reference |
 
 **Recommended review sequence:**
 
-1. `Tucker_Congruence` — scales with poor congruence (< 0.85) may need attention; for broad heterogeneous factors this is expected
-2. `Item_Scale_Heatmap` — for any scale with poor Tucker's congruence, use this as the primary screen: items where `heatmap_max_scale` matches the target and `heatmap_ratio` ≥ 2.0 are strong candidates regardless of PFA pass level
-3. `PFA_Scale_Summary` — scales where `daal_identity_confirmed = False` or high `disc_flag_count`
-4. `PFA_Item_Results` — filter `discriminant_flag_review = True` and `item_reversed_for_embedding = True` first
+1. `Item_Scale_Heatmap` — visual primary screen: items where `heatmap_max_scale` matches the target and the target similarity clearly dominates the row are strong candidates regardless of PFA pass level. Especially useful for broad heterogeneous factors where PFA pass rates are expected to be lower
+2. `PFA_Scale_Summary` — scales where `daal_identity_confirmed = False` or high `disc_flag_count`
+3. `PFA_Item_Results` — filter `discriminant_flag_review = True` and `item_reversed_for_embedding = True` first
 
 **Human review columns added:** `item_reversed_for_embedding` (system-set), `pfa_pass_level` (system-set), `human_review_pass` (default `True`), `human_comments`.
 
@@ -463,9 +494,9 @@ After PFA completes, Phase 5 assembles the final review-ready item pool. Items w
 
 - **`Review_Pool`** — all passing items with full quality metadata. Two blank columns for reviewer decisions.
 - **`Rejected_Items`** — excluded items, preserved for transparency.
-- **`Pool_Statistics`** — one row per scale: item counts by location level (`high_location_items`, `central_items`, `low_location_items`), mean c-value, mean d-value, mean atomic loading, bias flag counts, reversal counts.
+- **`Pool_Statistics`** — one row per scale: item counts by keying direction (`positive_keyed_items`, `negative_keyed_items`), mean c-value, mean d-value, mean atomic loading, bias flag counts, reversal counts.
 - **`Quality_Flags`** — every item with at least one automated concern: readability, bias, low c-value, low d-value, mapping failure, standard pass only, discriminant flag, DAAL failure, or reversal. Review these first.
-- **`Recommendations`** — scale-level guidance with HIGH / MEDIUM priority: scales with too few items per location level, high mean FK grade, multiple discriminant flags, DAAL failures, and reversal counts.
+- **`Recommendations`** — scale-level guidance with HIGH / MEDIUM priority: scales with too few items in either keying direction, scales with zero negatively keyed items (acquiescence bias cannot be detected), high mean FK grade, multiple discriminant flags, DAAL failures, and reversal counts.
 
 **Reviewer workflow:**
 
@@ -474,16 +505,16 @@ After PFA completes, Phase 5 assembles the final review-ready item pool. Items w
 3. Open **Review_Pool** scale by scale:
    - `human_decision`: type `accept`, `modify`, or `reject`
    - `human_notes`: free-text rationale, especially for modifications and reversals
-4. Check **Pool_Statistics** — each scale should have sufficient items at each active location level
+4. Check **Pool_Statistics** — each scale should have sufficient items in both keying directions
 
 **Review tips:**
 
 - Sort by `pfa_pass_level` descending to review HIGH_PASS items first
 - Filter by `discriminant_flag_review = True` and compare flagged items within the same scale
 - Items where `cv_majority_mapped_scale` differs from the target scale often need rewording
-- Items where `item_reversed_for_embedding = True` — confirm the semantic direction is positive before accepting
-- If a scale has fewer than 15 passing items, re-run Phase 2 for that scale before completing review
-- For HEXACO broad factors, `PFA_pass_level = FAIL` is expected at high rates — use `Item_Scale_Heatmap` ratio ≥ 2.0 as the primary screen
+- Items where `item_reversed_for_embedding = True` — confirm the positive-pole paraphrase preserved the intended meaning before accepting
+- If a scale has fewer than 15 passing items in either keying direction, re-run Phase 2 for that scale before completing review
+- For HEXACO broad factors, `PFA_pass_level = FAIL` can still be expected at elevated rates — use `Item_Scale_Heatmap` ratio ≥ 2.0 as a secondary screen. When `encoding_strategy = both`, compare the atomic vs. atomic-reversed single-factor loading columns in `PFA_Item_Results` to decide which strategy to favour per scale.
 
 ---
 
@@ -510,10 +541,9 @@ All pipeline behavior is controlled by `pipeline_settings.json`. Key settings ar
 
 ```json
 "phase_02_item_generation": {
-  "items_per_location": {
-    "high_location": 5,
-    "central": 5,
-    "low_location": 5
+  "items_per_keying": {
+    "positive": 10,
+    "negative": 5
   },
   "duplicate_removal_threshold": 0.85,
   "model": "anthropic/claude-haiku-4.5",
@@ -522,7 +552,7 @@ All pipeline behavior is controlled by `pipeline_settings.json`. Key settings ar
 }
 ```
 
-Set any location level to 0 to skip it entirely.
+Set either direction to 0 to skip it entirely. The default 2:1 positive-to-negative ratio balances acquiescence-bias control against method-factor inflation.
 
 ### Phase 3
 
@@ -569,6 +599,7 @@ c-value and d-value thresholds from Colquitt et al. (2019). Lower for explorator
 ```json
 "phase_05_pseudo_factor_analysis": {
   "transformer_models": ["all-MiniLM-L6-v2", "all-mpnet-base-v2"],
+  "encoding_strategy": "both",
   "min_rules_to_pass": 3,
   "model_fit_thresholds": {"rmsr_max": 0.08},
   "discriminant_validity": {
@@ -576,13 +607,15 @@ c-value and d-value thresholds from Colquitt et al. (2019). Lower for explorator
     "max_cross_loading_ceiling": 0.45,
     "ceiling_enabled": true
   },
-  "reversal_detection": {
+  "reversal_rewrite": {
     "model": "anthropic/claude-haiku-4.5",
     "temperature": 0.0
   },
-  "final_pool_target_per_location": 20
+  "final_pool_target_per_keying": 20
 }
 ```
+
+`encoding_strategy` can be `atomic`, `atomic_reversed`, or `both`. Use `atomic` for HEXACO-type instruments, `atomic_reversed` for NEO-type instruments, and `both` when the framework is unknown (Guenole et al., 2025).
 
 ---
 
@@ -700,18 +733,22 @@ Every item failed PFA or CV, or `human_review_pass` was set to `False` for all i
 **`KeyError` referencing a column name**  
 Phase 5 was run with an older version of the code. Re-run Phase 5 with the current code.
 
-**Pool_Statistics shows very uneven location distribution**  
-Behavioral examples from Phase 1 may have been concentrated at one occurrence level. Re-run Phase 1 with a higher `examples_per_construct` to get more balanced coverage.
+**Pool_Statistics shows very uneven keying distribution**  
+One keying direction is producing far fewer items than the other, or one is zero. Check the `items_per_keying` setting — the default is `{"positive": 10, "negative": 5}`. If the imbalance is coming from downstream attrition rather than generation (e.g., negatively keyed items are failing CV at higher rates), examine `04_content_validity.xlsx → CV_Item_Summary` for items where `item_keying = negative` and look at `cv_majority_mapped_scale` — SMEs sometimes rate the negative paraphrase lower on the target scale, which can indicate the reversal was not sharp enough. Revise wording in Phase 2 or widen the CV thresholds for exploratory work.
 
 ---
 
 ## 12. Glossary
 
+**Acquiescence bias** — the tendency of some respondents to agree with items regardless of content. Mixing positively and negatively keyed items within a scale is the standard control (Clark & Watson, 1995; DeVellis, 2017). Phase 2 of this pipeline generates both keying directions for this reason.
+
 **API (Application Programming Interface)** — a communication interface between software systems. The pipeline uses OpenRouter's API to send text to LLMs and receive responses.
 
 **API key** — a private credential identifying you to an API service. Stored in `.env`. Never share it.
 
-**Atomic encoding** — an embedding strategy where each item is encoded individually. The pipeline averages atomic cosine similarity matrices across all configured transformer models before factor analysis.
+**Atomic encoding** — an embedding strategy in which each item is encoded individually and a cosine similarity matrix is built across items. The pipeline averages atomic similarity matrices across all configured transformer models before factor analysis. Under the plain `atomic` strategy every item is embedded as written.
+
+**Atomic-reversed encoding** — a variant of atomic encoding in which negatively keyed items are paraphrased to their positive-pole equivalents by an LLM before embedding, so that every item shares the same semantic direction. Guenole et al. (2025) reported 94% factor recovery on NEO-type instruments under atomic-reversed versus 71% under standard atomic; on HEXACO the ordering reversed. The pipeline can run either strategy or both (`encoding_strategy` setting).
 
 **Checkpoint** — a progress save file created by Phase 4 every 100 items (`output/04_checkpoint.json`). Enables automatic resume after interruption.
 
@@ -731,25 +768,29 @@ Behavioral examples from Phase 1 may have been concentrated at one occurrence le
 
 **Discriminant validity** — evidence that a measure of construct A is sufficiently different from a measure of construct B. Assessed in Phase 5 by comparing each item's target factor loading to its maximum cross-loading.
 
+**Dominance model** — an item response model in which endorsement probability is a monotone function of the respondent's trait level: higher trait = higher endorsement for positively keyed items, and the reverse for negatively keyed items. This is the standard Likert format used in IPIP-NEO, IPIP-HEXACO, Big Five Inventory, DASS, RIASEC, and essentially all operational personality inventories. Phase 2 of this pipeline generates dominance items. Contrast with ideal-point models.
+
 **Embedding** — a numerical vector representation of text produced by a language model. The pipeline uses embeddings to compute semantic similarity between items and between items and scales.
 
 **Factor analysis** — a statistical technique identifying underlying patterns in a correlation matrix. Phase 5 applies it to AI-generated similarity matrices rather than human response data.
 
 **Flesch-Kincaid grade** — a readability score expressed as a US school grade level. Grade 8 means a typical 13–14-year-old can read the text. The pipeline's primary readability metric.
 
-**GGUM (Generalized Graded Unfolding Model)** — an ideal point item response theory model in which each item has a characteristic location on the trait continuum — the point at which endorsement probability is maximized. Phase 2 generates items at three calibrated locations: `high_location`, `central`, and `low_location`.
+**GGUM (Generalized Graded Unfolding Model)** — an ideal-point item response theory model in which each item has a characteristic location on the trait continuum. The pipeline previously used GGUM-style location stratification but has been revised to use standard dominance items (the Likert format), which is the framework on which the PFA validation literature was developed (Guenole et al., 2025; Milano et al., 2025). Retained here only for historical reference.
 
 **GPU (Graphics Processing Unit)** — used for AI computation in Phase 5. Significantly faster than CPU for transformer encoding.
 
 **HEXACO** — a six-factor personality model: Honesty-Humility, Emotionality, Extraversion, Agreeableness, Conscientiousness, and Openness to Experience (Ashton & Lee, 2007).
 
-**Ideal point model** — a measurement model in which respondents endorse items closest to their own standing on the trait continuum, rather than monotonically more extreme items. Contrast with dominance models (Likert). Phase 2 item generation is calibrated for ideal point measurement.
+**Ideal point model** — a measurement model in which respondents endorse items closest to their own standing on the trait continuum, rather than monotonically more extreme items. Contrast with dominance models (Likert). This pipeline generates dominance items, not ideal-point items — see `item_keying`.
 
-**item_location_target** — the column in all Phase 2+ output files recording the GGUM continuum location for which each item was written: `high_location`, `central`, or `low_location`.
+**item_keying** — the column in all Phase 2+ output files recording the keying direction of each item: `positive` (standard dominance, higher trait = stronger endorsement) or `negative` (genuine semantic reversal, lower trait = stronger endorsement). The value drives keying-aware behaviour in every downstream phase: simplification preservation (Phase 3), carry-through diagnostic (Phase 4), and reversal for embedding + within-keying factor analysis (Phase 5).
 
 **JSON (JavaScript Object Notation)** — the text format used for `pipeline_settings.json` and `scales.json`.
 
 **Kernel** — the Python process running the Jupyter Notebook. Restarting it clears all variables. Always re-run Section 0 after a restart.
+
+**Keying direction** — whether an item is written so that higher trait corresponds to stronger endorsement (positively keyed) or lower trait corresponds to stronger endorsement (negatively keyed). Recorded in the `item_keying` column from Phase 2 onward. Drives simplification preservation (Phase 3), reversal for embedding under atomic-reversed (Phase 5), and within-keying factor analysis (Phase 5).
 
 **LLM (Large Language Model)** — an AI system trained on large amounts of text. The pipeline uses Claude, GPT-4o, Llama, Grok, and DeepSeek via OpenRouter.
 
@@ -757,11 +798,13 @@ Behavioral examples from Phase 1 may have been concentrated at one occurrence le
 
 **Macro encoding** — an embedding strategy where all items in a scale are concatenated before encoding. The pipeline averages macro item-to-scale cosine similarities across configured transformer models.
 
+**Negatively keyed item** — an item written as a genuine semantic reversal of the construct, so that respondents low on the trait endorse it more strongly. Distinct from a low-intensity positive item: `"I often look for ways around workplace rules"` is a negatively keyed Conscientiousness item, whereas `"I sometimes forget workplace rules"` would be a low-intensity positive. Included alongside positively keyed items to control acquiescence bias.
+
 **OpenRouter** — a service providing unified API access to multiple LLM providers through a single key.
 
 **PFA (Pseudo-Factor Analysis)** — factor analysis applied to a matrix of AI-generated embedding similarity scores between items, rather than to a matrix of empirical correlations from human responses. Theoretical basis is the substitutability assumption.
 
-**RMSR (Root Mean Square Residual)** — the only model fit metric computed in Phase 5. Measures the average size of unexplained correlations after the factor model is applied. Values below 0.08 indicate acceptable fit; below 0.05 indicates good fit. CFI, TLI, and RMSEA are not computed as they require sample size.
+**RMSR (Root Mean Square Residual)** — the model fit metric computed in Phase 5. Measures the average size of unexplained correlations after the factor model is applied. Values below 0.08 indicate acceptable fit; below 0.05 indicates good fit.
 
 **Scale mapping agreement** — the proportion of Phase 4 SMEs whose highest-rated scale matches the target scale for an item. Retained as a diagnostic metric alongside c-value and d-value.
 
@@ -771,7 +814,7 @@ Behavioral examples from Phase 1 may have been concentrated at one occurrence le
 
 **Substitutability assumption** — the theoretical basis for PFA: that an item's embedding vector can substitute for an empirical response vector during early-stage scale development (Guenole et al., 2025).
 
-**Tucker's congruence coefficient** — a measure of similarity between two factor loading vectors. Values ≥ 0.95 indicate excellent equivalence; ≥ 0.85 indicates fair similarity (Lorenzo-Seva & ten Berge, 2006). Used in Phase 5 to compare atomic and macro encoding solutions per scale.
+**Tucker's congruence coefficient** — a statistical measure of similarity between two factor loading vectors, with published thresholds from Lorenzo-Seva and ten Berge (2006). Not currently reported by this pipeline: the comparison previously implemented (atomic loadings vs. macro similarities) did not live in the comparison space for which those thresholds are calibrated, so reporting it as Tucker's was misleading. A proper Tucker's comparison would require published validation loadings from an external study (as in Guenole et al., 2025; Milano et al., 2025), which this pipeline does not currently import.
 
 ---
 
@@ -796,6 +839,10 @@ Behavioral examples from Phase 1 may have been concentrated at one occurrence le
 > Colquitt, J. A., Sabey, T. B., Rodell, J. B., & Hill, E. T. (2019). Content validation guidelines: Evaluation criteria for definitional correspondence and definitional distinctiveness. *Journal of Applied Psychology*, *104*(10), 1243–1265. https://doi.org/10.1037/apl0000406
 
 > Zieky, M. J. (2013). *So much has changed: How the setting of cutscores has evolved since the 1980s.* In M. J. Zieky (Ed.), *Setting performance standards: Foundations, methods, and innovations* (2nd ed., pp. 15–34). Lawrence Erlbaum Associates.
+
+> Clark, L. A., & Watson, D. (1995). Constructing validity: Basic issues in objective scale development. *Psychological Assessment*, *7*(3), 309–319. https://doi.org/10.1037/1040-3590.7.3.309
+
+> DeVellis, R. F. (2017). *Scale Development: Theory and Applications* (4th ed.). SAGE Publications.
 
 ---
 

@@ -1,136 +1,70 @@
 {
+  "_comment": "Construct definitions for Project Majdal. Population, environment, reading level, and response format come from scale_defaults in pipeline_settings.json unless explicitly overridden here on a per-scale basis.",
   "scales": [
     {
-      "id": "HH_Ho",
-      "measure": "Personality",
-      "personality_type": "Normal",
-      "construt_level": "Factor",
-      "scale_name": "Honesty-Humility",
-      "construct_definition": "The tendency to be sincere, fair, and modest in dealings with others, and to avoid manipulating, exploiting, or deceiving people for personal gain. Individuals high in Honesty-Humility are guided by strong moral principles, treat others as equals regardless of status, avoid flattery or pretension, and are uninterested in accumulating wealth or social prestige at others' expense. They do not bend rules for personal advantage and feel uncomfortable with dishonest or corrupt behaviour. Those low in Honesty-Humility are more willing to deceive or manipulate others to achieve their goals, are motivated by status and material gain, feel entitled to special privileges, and may exploit others if it serves their interests.",
-      "high_anchor": "Avoids deception, manipulation, and exploitation in all dealings. Treats people fairly and impartially regardless of personal benefit. Is modest about achievements and unimpressed by wealth or social status. Feels strongly opposed to corruption, flattery, and rule-bending for personal advantage.",
-      "low_anchor": "Willing to use flattery, deception, or manipulation to get what they want. Motivated by wealth, status, and personal gain. Feels entitled to special treatment. Comfortable bending rules when it benefits them personally.",
-      "measure_type": "Trait",
-      "discriminant_description": "Honesty-Humility is distinct from Agreeableness, which concerns tolerant and cooperative behaviour toward others rather than moral integrity and the avoidance of exploitation. It is also distinct from Conscientiousness, which concerns self-discipline and organisation rather than ethical conduct.",
-      "target_population": {
-        "age_range": "18-65",
-        "education_level": "High school graduates or above",
-        "environment_context": "Workplace and social environments",
-        "cultural_context": "Global business context"
-      },
-      "target_environment": "General working population",
-      "reading_level_target": 8,
-      "response_format": "likert_5",
-      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
-    },
-    {
-      "id": "Em_Em",
-      "measure": "Personality",
-      "personality_type": "Normal",
-      "construt_level": "Factor",
-      "scale_name": "Emotionality",
-      "construct_definition": "The tendency to experience fear, anxiety, and emotional distress in response to perceived threats, and to feel a strong need for emotional support from others. Individuals high in Emotionality are sensitive to physical and social dangers, feel emotionally close to others and empathise readily, and experience strong feelings of worry and vulnerability. They form deep emotional bonds and are sensitive to the emotional needs of people around them. Those low in Emotionality are emotionally resilient, calm under pressure, relatively unconcerned about physical danger, and less dependent on others for emotional support. They tend to experience feelings with less intensity and are less prone to distress.",
-      "high_anchor": "Worries frequently about potential dangers and feels anxious in uncertain situations. Feels a strong need for emotional closeness with others. Is easily moved by others' distress and is highly attuned to emotional undercurrents. Experiences feelings with considerable intensity.",
-      "low_anchor": "Remains calm and untroubled in threatening or uncertain situations. Is emotionally self-sufficient and does not depend on others for reassurance. Is less responsive to others' emotional distress. Experiences feelings with relatively low intensity.",
-      "measure_type": "Trait",
-      "discriminant_description": "Emotionality in the HEXACO model differs from Neuroticism in the Big Five. Emotionality includes a sentimental, empathic component — the tendency to feel close to others and be moved by their distress — which is absent from Neuroticism. Emotionality is distinct from Agreeableness, which concerns tolerance and cooperation rather than emotional sensitivity and need for closeness.",
-      "target_population": {
-        "age_range": "18-65",
-        "education_level": "High school graduates or above",
-        "environment_context": "Workplace and social environments",
-        "cultural_context": "Global business context"
-      },
-      "target_environment": "General working population",
-      "reading_level_target": 8,
-      "response_format": "likert_5",
-      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
-    },
-    {
-      "id": "Ex_Ex",
-      "measure": "Personality",
-      "personality_type": "Normal",
-      "construt_level": "Factor",
-      "scale_name": "Extraversion",
-      "construct_definition": "The tendency to feel positively about oneself and others, to enjoy social interaction and group activity, and to experience positive emotions readily. Individuals high in Extraversion feel comfortable and energised in social settings, enjoy being the centre of attention, express enthusiasm and positive affect openly, and tend to feel confident in social and leadership situations. Those low in Extraversion (high in Introversion) prefer solitary or small-group activities, feel less energised by social interaction, express less positive affect, and are less inclined to seek social dominance or attention.",
-      "high_anchor": "Feels energised and comfortable in social situations. Enjoys meeting new people, engaging in group activities, and being around others. Expresses positive emotions freely and is seen as warm and enthusiastic. Tends to take the lead in social settings.",
-      "low_anchor": "Prefers solitude or small familiar groups over large social gatherings. Feels drained rather than energised by extended social interaction. Is reserved in expressing positive emotions. Does not seek attention or social dominance.",
-      "measure_type": "Trait",
-      "discriminant_description": "Extraversion in the HEXACO model includes a self-esteem component that is absent from Big Five Extraversion. It is distinct from Openness to Experience, which concerns intellectual curiosity and aesthetic sensitivity rather than social engagement and positive affect.",
-      "target_population": {
-        "age_range": "18-65",
-        "education_level": "High school graduates or above",
-        "environment_context": "Workplace and social environments",
-        "cultural_context": "Global business context"
-      },
-      "target_environment": "General working population",
-      "reading_level_target": 8,
-      "response_format": "likert_5",
-      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
-    },
-    {
-      "id": "Ag_Ag",
-      "measure": "Personality",
-      "personality_type": "Normal",
-      "construt_level": "Factor",
-      "scale_name": "Agreeableness",
-      "construct_definition": "The tendency to be forgiving, tolerant, and gentle in dealings with others, and to suppress feelings of anger and resentment when provoked or treated unfairly. Individuals high in Agreeableness are patient and accommodating, willing to overlook perceived wrongs, and inclined to cooperate rather than compete or retaliate. They avoid conflict, adopt a charitable view of others' intentions, and are not easily moved to anger or criticism. Those low in Agreeableness are critical, quick to judge, and inclined to hold grudges. They become easily irritated by others' faults, are willing to express anger, and may be combative or competitive in interpersonal situations.",
-      "high_anchor": "Responds to provocation or unfair treatment with patience and tolerance. Forgives perceived wrongs and does not hold grudges. Avoids conflict and is not easily moved to anger or criticism. Adopts a charitable view of others' motives and intentions.",
-      "low_anchor": "Becomes easily irritated or angered by others. Is critical of others' faults and quick to judge. Holds grudges and finds it difficult to forgive. Willing to express anger and engage in conflict when provoked.",
-      "measure_type": "Trait",
-      "discriminant_description": "In the HEXACO model, Agreeableness specifically concerns the tendency to suppress anger and tolerate others' behaviour toward oneself. It is distinct from Honesty-Humility, which concerns moral integrity and the avoidance of exploitation. It is also distinct from Emotionality, which concerns sensitivity to fear and need for emotional closeness rather than tolerance and anger management.",
-      "target_population": {
-        "age_range": "18-65",
-        "education_level": "High school graduates or above",
-        "environment_context": "Workplace and social environments",
-        "cultural_context": "Global business context"
-      },
-      "target_environment": "General working population",
-      "reading_level_target": 8,
-      "response_format": "likert_5",
-      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
-    },
-    {
-      "id": "Co_Co",
-      "measure": "Personality",
-      "personality_type": "Normal",
-      "construt_level": "Factor",
-      "scale_name": "Conscientiousness",
-      "construct_definition": "The tendency to be organised, diligent, and self-disciplined in pursuing goals and meeting obligations. Individuals high in Conscientiousness work carefully and methodically, maintain order in their environment and schedules, deliberate thoroughly before acting, and follow through on commitments reliably. They are perfectionistic about the quality of their work and feel discomfort when tasks are left incomplete or done poorly. Those low in Conscientiousness are less organised and systematic in their approach to tasks, more impulsive in decision-making, less concerned with precision or thoroughness, and more tolerant of disorder and incomplete work.",
-      "high_anchor": "Works in an organised and systematic way. Takes care over the quality and accuracy of their work. Deliberates carefully before making decisions. Meets deadlines and follows through on commitments reliably. Feels discomfort when work is incomplete or disorderly.",
-      "low_anchor": "Approaches tasks in an unsystematic or disorganised way. Is less concerned with precision, thoroughness, or quality. Makes decisions impulsively without careful deliberation. Is tolerant of incomplete work and disorder.",
-      "measure_type": "Trait",
-      "discriminant_description": "Conscientiousness concerns self-regulation and task performance rather than moral conduct. It is distinct from Honesty-Humility, which concerns ethical integrity and fairness. It is also distinct from Openness to Experience, which concerns curiosity and creative thinking rather than orderliness and diligence.",
-      "target_population": {
-        "age_range": "18-65",
-        "education_level": "High school graduates or above",
-        "environment_context": "Workplace and social environments",
-        "cultural_context": "Global business context"
-      },
-      "target_environment": "General working population",
-      "reading_level_target": 8,
-      "response_format": "likert_5",
-      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
-    },
-    {
-      "id": "Op_Op",
+      "id": "B5_Op",
       "measure": "Personality",
       "personality_type": "Normal",
       "construt_level": "Factor",
       "scale_name": "Openness to Experience",
-      "construct_definition": "The tendency to seek out and appreciate aesthetic, intellectual, and creative experiences, and to engage imaginatively with ideas, art, and unconventional perspectives. Individuals high in Openness to Experience are curious, inventive, and drawn to novelty in both the intellectual and aesthetic domains. They enjoy abstract thinking, are attentive to beauty in art and nature, and are willing to reconsider conventional beliefs. Those low in Openness to Experience are more practically minded, less drawn to art or abstract ideas, prefer familiar and conventional approaches, and are less likely to question established ways of doing things.",
-      "high_anchor": "Is strongly drawn to art, music, literature, and aesthetic beauty. Enjoys abstract and theoretical thinking. Is imaginative and seeks out novel ideas and experiences. Is willing to question conventional beliefs and consider unconventional perspectives.",
-      "low_anchor": "Has little interest in art, aesthetics, or abstract intellectual pursuits. Prefers practical and concrete thinking over theoretical speculation. Is more comfortable with familiar, conventional approaches. Is less inclined to question established beliefs or explore unconventional ideas.",
+      "construct_definition": "The tendency to seek out, appreciate, and engage with varied experience, aesthetic impressions, imaginative ideas, and intellectual pursuits. Individuals high in Openness are curious, imaginative, and receptive to novel and unconventional perspectives. They enjoy exploring abstract ideas, appreciate art and beauty across forms, notice and reflect on their own inner feelings, and are willing to question established values and authority. Those low in Openness are more conventional in outlook, prefer the familiar to the novel, are less drawn to aesthetic or intellectual pursuits, and tend to hold traditional values and defer to established ways of doing things.",
+      "high_anchor": "Seeks out new experiences, ideas, and aesthetic impressions. Engages with art, literature, and abstract thinking. Attends to inner feelings and imaginative life. Is willing to question conventional beliefs and authority. Prefers variety and novelty over routine.",
+      "low_anchor": "Prefers the familiar, conventional, and practical over the novel and abstract. Has little interest in art, aesthetics, or theoretical ideas. Is less attentive to inner experience and imagination. Defers to tradition and established authority. Prefers routine over variety.",
       "measure_type": "Trait",
-      "discriminant_description": "Openness to Experience concerns aesthetic sensitivity and intellectual curiosity rather than social behaviour or emotional experience. It is distinct from Extraversion, which concerns social engagement and positive affect. It is also distinct from Conscientiousness, which concerns orderliness and diligence rather than curiosity or imaginative thinking.",
-      "target_population": {
-        "age_range": "18-65",
-        "education_level": "High school graduates or above",
-        "environment_context": "Workplace and social environments",
-        "cultural_context": "Global business context"
-      },
-      "target_environment": "General working population",
-      "reading_level_target": 8,
-      "response_format": "likert_5",
-      "reference": "Ashton, M. C., & Lee, K. (2007). Empirical, theoretical, and practical advantages of the HEXACO model of personality structure. Personality and Social Psychology Review, 11(2), 150-166."
+      "discriminant_description": "Openness to Experience concerns receptivity to varied experience, aesthetic sensitivity, and intellectual curiosity. It is distinct from Conscientiousness, which concerns self-discipline and order rather than curiosity or imagination. It is also distinct from Extraversion, which concerns social engagement and positive affect rather than aesthetic or intellectual receptivity. Openness is not the same as intelligence or cognitive ability — it reflects orientation toward experience, not capacity.",
+      "reference": "Costa, P. T., & McCrae, R. R. (1992). Revised NEO Personality Inventory (NEO-PI-R) and NEO Five-Factor Inventory (NEO-FFI) professional manual. Psychological Assessment Resources. See also John, O. P., & Srivastava, S. (1999). The Big Five trait taxonomy. In L. A. Pervin & O. P. John (Eds.), Handbook of personality (2nd ed., pp. 102-138). Guilford Press."
+    },
+    {
+      "id": "B5_Co",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Conscientiousness",
+      "construct_definition": "The tendency to be organised, diligent, self-disciplined, and deliberate in pursuing goals and meeting obligations. Individuals high in Conscientiousness work carefully and systematically, plan ahead, follow through on commitments, maintain order in their environment and activities, and exercise impulse control in the service of long-term goals. They are dependable, hardworking, and achievement-oriented, and feel discomfort when tasks are incomplete or done carelessly. Those low in Conscientiousness are less organised and systematic, more impulsive and spontaneous in decision-making, less concerned with precision or thoroughness, and more willing to leave tasks incomplete or proceed without a clear plan.",
+      "high_anchor": "Works in an organised, systematic, and thorough manner. Plans ahead and follows through on commitments reliably. Exercises self-discipline and impulse control. Strives for high standards of accuracy and completeness in work. Maintains order in environment and schedule.",
+      "low_anchor": "Approaches tasks in an unsystematic or disorganised way. Acts impulsively without careful planning. Is tolerant of incomplete or imprecise work. Struggles with self-discipline and follow-through. Is comfortable with disorder in environment and schedule.",
+      "measure_type": "Trait",
+      "discriminant_description": "Conscientiousness concerns self-regulation, organisation, and goal-directed diligence. It is distinct from Agreeableness, which concerns interpersonal warmth and cooperation rather than self-discipline. It is also distinct from Neuroticism — a conscientious person is not necessarily anxious or guilt-prone, though both traits can involve concern about performance. Conscientiousness is about regulated pursuit of goals, not about the emotional experience of pursuing them.",
+      "reference": "Costa, P. T., & McCrae, R. R. (1992). Revised NEO Personality Inventory (NEO-PI-R) and NEO Five-Factor Inventory (NEO-FFI) professional manual. Psychological Assessment Resources."
+    },
+    {
+      "id": "B5_Ex",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Extraversion",
+      "construct_definition": "The tendency to be outgoing, energetic, assertive, and positive in social and emotional life. Individuals high in Extraversion enjoy being around others, seek out stimulation and excitement, experience positive emotions readily, and are inclined to take social initiative and assert themselves in groups. They are talkative, enthusiastic, and drawn to lively environments. Those low in Extraversion (introverts) prefer quieter, less stimulating environments, are more reserved in social settings, experience positive affect less intensely, and are less inclined to seek out attention or dominance. Introversion is not the same as shyness or social anxiety — it reflects a lower preference for stimulation and social engagement, not a fear of it.",
+      "high_anchor": "Enjoys and seeks out social interaction and stimulating environments. Is talkative, enthusiastic, and expressive of positive emotion. Takes initiative in social and group settings. Feels energised by being around other people. Is drawn to excitement and activity.",
+      "low_anchor": "Prefers quieter, less stimulating environments and smaller social groups. Is reserved, soft-spoken, and less expressive of emotion. Feels drained rather than energised by extended social interaction. Does not seek out attention, excitement, or social dominance.",
+      "measure_type": "Trait",
+      "discriminant_description": "Extraversion concerns sociability, positive affect, and activity level. It is distinct from Agreeableness, which concerns warmth and cooperation toward others rather than social engagement per se — one can be warm and agreeable while still being introverted. It is also distinct from Openness, which concerns receptivity to varied experience. Low Extraversion is not the same as anxiety or social phobia (which belong to Neuroticism) — introverted individuals are not necessarily anxious in social settings, simply less drawn to them.",
+      "reference": "Costa, P. T., & McCrae, R. R. (1992). Revised NEO Personality Inventory (NEO-PI-R) and NEO Five-Factor Inventory (NEO-FFI) professional manual. Psychological Assessment Resources."
+    },
+    {
+      "id": "B5_Ag",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Agreeableness",
+      "construct_definition": "The tendency to be cooperative, trusting, warm, and considerate in interpersonal relationships. Individuals high in Agreeableness are sympathetic to others, willing to help, inclined to trust people's good intentions, and prefer cooperation over competition or conflict. They are tender-minded, modest about themselves, and straightforward rather than manipulative in their dealings. Those low in Agreeableness are more competitive, sceptical of others' motives, willing to express anger or criticism, and more focused on their own interests in interpersonal situations. They may be blunt, tough-minded, or antagonistic.",
+      "high_anchor": "Is trusting, cooperative, and considerate toward others. Is sympathetic to others' needs and willing to help. Is modest about own achievements and straightforward in dealings with others. Prefers harmony and avoids unnecessary conflict.",
+      "low_anchor": "Is sceptical of others' motives and competitive rather than cooperative. Is willing to express criticism, anger, or antagonism. Is focused on own interests in interpersonal situations. Is tough-minded and willing to engage in conflict.",
+      "measure_type": "Trait",
+      "discriminant_description": "Agreeableness concerns warmth, trust, and cooperation in interpersonal relationships. It is distinct from Extraversion, which concerns social engagement and positive affect rather than the quality of interpersonal orientation — an extraverted person can be disagreeable (outgoing but combative), and an introverted person can be highly agreeable (quietly warm and cooperative). It is also distinct from Conscientiousness; reliability in meeting commitments is a Conscientiousness property, whereas warmth and cooperation in how one meets them is Agreeableness.",
+      "reference": "Costa, P. T., & McCrae, R. R. (1992). Revised NEO Personality Inventory (NEO-PI-R) and NEO Five-Factor Inventory (NEO-FFI) professional manual. Psychological Assessment Resources."
+    },
+    {
+      "id": "B5_Ne",
+      "measure": "Personality",
+      "personality_type": "Normal",
+      "construt_level": "Factor",
+      "scale_name": "Neuroticism",
+      "construct_definition": "The tendency to experience negative emotions — including anxiety, sadness, anger, guilt, and self-consciousness — readily and intensely, and to perceive ordinary situations as threatening or distressing. Individuals high in Neuroticism worry frequently, feel tense and vulnerable, are prone to low mood and emotional reactivity, and may struggle to cope with stress and return to emotional equilibrium after setbacks. Those low in Neuroticism (high in Emotional Stability) are calm, relaxed, resilient under stress, and less prone to experiencing strong negative emotions. They recover quickly from setbacks and are less affected by daily frustrations and worries.",
+      "high_anchor": "Worries frequently and feels anxious in ordinary situations. Experiences negative emotions — sadness, anger, guilt, self-consciousness — readily and intensely. Feels vulnerable to stress and struggles to recover from setbacks. Is emotionally reactive to daily events.",
+      "low_anchor": "Is calm, relaxed, and emotionally steady. Experiences negative emotions less frequently and less intensely. Recovers quickly from setbacks and stress. Is not easily upset by daily frustrations or worries. Feels secure and resilient.",
+      "measure_type": "Trait",
+      "discriminant_description": "Neuroticism concerns the frequency and intensity of negative emotional experience and vulnerability to stress. It is distinct from low Agreeableness — a person can be emotionally stable yet disagreeable (calmly hostile), or emotionally reactive yet agreeable (anxious but warm). It is also distinct from low Extraversion; introversion is a preference for less stimulation, whereas Neuroticism is a propensity to experience distress. Neuroticism is not the same as clinical depression or anxiety disorder — it reflects a dimension of normal personality variation, not a diagnostic category.",
+      "reference": "Costa, P. T., & McCrae, R. R. (1992). Revised NEO Personality Inventory (NEO-PI-R) and NEO Five-Factor Inventory (NEO-FFI) professional manual. Psychological Assessment Resources."
     }
   ]
 }

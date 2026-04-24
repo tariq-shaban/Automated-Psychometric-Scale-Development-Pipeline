@@ -8,7 +8,7 @@
     "log_level": "INFO"
   },
   "scale_defaults": {
-    "_comment": "Default values applied to every scale when the field is missing from the source JSON. Edit these to match your population and environment.",
+    "_comment": "Default values applied to every scale when the field is missing from the source JSON. Edit these to match your population and environment. These values are the single source of truth for population/environment/reading level/response format — scales.json should not duplicate them unless a per-scale override is genuinely required.",
     "target_population": {
       "age_range": "18-65",
       "education_level": "High school graduates or above",
@@ -21,14 +21,14 @@
   },
   "phase_01_behavioral_domains": {
     "_comment": "Behavioral domain generation AND validation in a single phase. Generates observable behavioral examples then validates each against construct, face, and discriminant validity. LEVEL = likelihood of occurrence in target environment, not item extremity.",
-    "examples_per_construct": 3,
+    "examples_per_construct": 2,
     "output_file": "01_behavioral_domains.xlsx",
     "generation_model": "anthropic/claude-haiku-4.5",
     "generation_max_tokens": 1500,
     "generation_temperature": 0.7,
-    "validation_model": "anthropic/claude-haiku-4.5",
+    "validation_model": "openai/gpt-4o",
     "validation_max_tokens": 2000,
-    "validation_temperature": 0.3,
+    "validation_temperature": 0.5,
     "retry_attempts": 3,
     "retry_delay_base_seconds": 2,
     "min_valid_examples_threshold": 5,
@@ -70,22 +70,23 @@
     }
   },
   "phase_02_item_generation": {
-    "_comment": "Stratified item generation from validated behavioral examples",
+    "_comment": "Dominance-item generation from validated behavioral examples. Items are stratified by keying direction (positively vs. negatively keyed) rather than by location on a trait continuum. A roughly 2:1 positive-to-negative ratio is recommended to control acquiescence bias without over-weighting method-factor variance from negatively keyed items.",
     "output_file": "02_generated_items.xlsx",
     "model": "anthropic/claude-haiku-4.5",
     "max_tokens": 2000,
     "temperature": 0.8,
     "retry_attempts": 3,
-    "items_per_location": {
-        "high_location": 5,
-        "central": 0,
-        "low_location": 0
+    "items_per_keying": {
+      "_comment": "Number of items to generate per behavioral domain for each keying direction. positive = standard monotone dominance items (higher trait → stronger endorsement). negative = genuine semantic reversals (lower trait → stronger endorsement), not avoidance or low-intensity statements.",
+      "positive": 4,
+      "negative": 1
     },
     "inter_example_delay_seconds": 1,
-    "duplicate_removal_threshold": 0.85,
+    "duplicate_detection_model": "all-MiniLM-L6-v2",
+    "_comment_duplicate_detection": "Semantic similarity via Sentence-BERT catches paraphrase duplicates that lexical TF-IDF misses (e.g., 'I move on once a task feels done' / 'I move forward once a task feels complete'). Threshold 0.80 calibrated for SBERT short-item similarity; lexical TF-IDF would use ~0.85.",
     "pass_rules": {
       "duplicate_removal": {
-        "description": "Near-duplicate items (cosine similarity >= threshold) are removed",
+        "description": "Near-duplicate items (cosine similarity >= threshold) are flagged within each keying direction",
         "threshold": 0.85,
         "operator": "<",
         "field": "pairwise_cosine_similarity"
@@ -95,50 +96,50 @@
         "threshold": 9,
         "operator": "<="
       },
-      "no_negations": {
-        "description": "Items containing negation patterns are flagged (I don't / I never / I am not)",
+      "no_negations_positive_only": {
+        "description": "Positively keyed items containing negation patterns are flagged. Negatively keyed items are permitted (and expected) to use negation and reversal language.",
         "pattern": "(?i)\\bI (don't|never|am not|cannot|won't|wouldn't)\\b",
         "flag_only": true
       }
     },
     "human_review_columns": {
-      "human_review_pass": "Boolean. Default True. Set False to exclude an item before readability analysis. Phase 3 reads this column.",
+      "human_review_pass": "Boolean. Default True. Set False to exclude an item before readability analysis. Phase 3 reads this column. Any edits to item_text are also carried forward.",
       "human_comments": "Free text. Notes on obvious construct contamination or generation failure."
     }
   },
   "phase_03_readability_bias": {
-  "_comment": "Readability analysis, LLM simplification, and LLM bias review. Bias is evaluated by multiple LLM reviewers using a structured rubric aligned with Zieky (2013) and Lee et al. (2025).",
-  "output_file": "03_readability_bias.xlsx",
-  "reading_level_target": 8,
-  "reading_level_hard_cap": 12,
-  "max_simplification_attempts": 3,
-  "simplification_model": "anthropic/claude-haiku-4.5",
-  "simplification_max_tokens": 150,
-  "simplification_temperature": 0.3,
-  "readability_metrics": [
-    "flesch_kincaid_grade", "flesch_reading_ease", "gunning_fog",
-    "coleman_liau_index", "smog_index", "automated_readability_index"
-  ],
-  "bias_review": {
-    "models": [
-      "anthropic/claude-haiku-4.5",
-      "openai/gpt-4o"
+    "_comment": "Readability analysis, LLM simplification, and LLM bias review. Bias is evaluated by multiple LLM reviewers using a structured rubric aligned with Zieky (2013) and Lee et al. (2025).",
+    "output_file": "03_readability_bias.xlsx",
+    "reading_level_target": 8,
+    "reading_level_hard_cap": 12,
+    "max_simplification_attempts": 3,
+    "simplification_model": "anthropic/claude-haiku-4.5",
+    "simplification_max_tokens": 150,
+    "simplification_temperature": 0.3,
+    "readability_metrics": [
+      "flesch_kincaid_grade", "flesch_reading_ease", "gunning_fog",
+      "coleman_liau_index", "smog_index", "automated_readability_index"
     ],
-    "max_tokens": 400,
-    "temperature": 0.1,
-    "retry_attempts": 3,
-    "dimensions": [
-      "gender",
-      "ethnicity_race",
-      "age",
-      "religion_culture",
-      "socioeconomic",
-      "sexual_orientation_disability"
-    ],
-    "flag_threshold": 3.5,
-    "max_workers": 3
-  }
-},
+    "bias_review": {
+      "models": [
+        "anthropic/claude-haiku-4.5",
+        "openai/gpt-4o"
+      ],
+      "max_tokens": 400,
+      "temperature": 0.1,
+      "retry_attempts": 3,
+      "dimensions": [
+        "gender",
+        "ethnicity_race",
+        "age",
+        "religion_culture",
+        "socioeconomic",
+        "sexual_orientation_disability"
+      ],
+      "flag_threshold": 3.5,
+      "max_workers": 3
+    }
+  },
   "phase_04_content_validity": {
     "_comment": "Multi-LLM SME content validity review using correspondence (c-value) and distinctiveness (d-value) indices following Hinkin & Tracey (1999) as operationalized by Colquitt et al. (2019) and implemented in the LM-AIG framework (Lee, Son, & Jia, 2025).",
     "output_file": "04_content_validity.xlsx",
@@ -190,18 +191,20 @@
     "sme_max_workers": 5,
     "human_review_columns": {
       "cv_pass": "System-set Boolean. True if both c-value >= min_c_value AND d-value >= min_d_value thresholds are met.",
-      "human_review_pass": "Boolean. Default True. Overrides cv_pass. Phase 5 reads this column.",
+      "human_review_pass": "Boolean. Default True. Overrides cv_pass. Phase 5 reads this column. Any edits to item_text are also carried forward.",
       "human_comments": "Free text. Especially useful when c-value or d-value is borderline."
     }
   },
   "phase_05_pseudo_factor_analysis": {
-    "_comment": "Semantic PFA using sentence transformers as a proxy for item correlations, followed by final item pool assembly and human review package. transformer_models is a list: if multiple models are specified, their cosine similarity matrices are averaged before factor analysis. Default is a single model.",
+    "_comment": "Semantic PFA using sentence transformers as a proxy for item correlations, followed by final item pool assembly and human review package. transformer_models is a list: if multiple models are specified, their cosine similarity matrices are averaged before factor analysis. Reversal for embedding is driven by the item_keying flag from Phase 2 — no heuristic detection is required.",
     "output_file": "05_pseudo_factor_analysis.xlsx",
-    "reversal_detection": {
+    "encoding_strategy": "both",
+    "_comment_encoding_strategy": "atomic = standard; negatively keyed items embedded as written. atomic_reversed = flip negatively keyed items to their positive-pole paraphrase before embedding (recommended for NEO-type instruments; Guenole et al. 2025). both = run both strategies and report Tucker's congruence for each scale. Based on Guenole et al. (2025): atomic-reversed achieved 94% factor recovery on NEO vs 71% with standard atomic; standard atomic achieved 98% on HEXACO. For unknown instruments, run both and choose per scale.",
+    "reversal_rewrite": {
+      "_comment": "LLM call used to paraphrase negatively keyed items to their positive-pole equivalents for the atomic_reversed encoding strategy. Triggered deterministically by item_keying == 'negative'; no heuristic detection step is used. Keep temperature at 0 for reproducibility.",
       "model": "anthropic/claude-haiku-4.5",
       "max_tokens": 100,
-      "temperature": 0.0,
-      "_comment": "LLM used to detect and rewrite semantically low-pole items before embedding. Temperature 0 for deterministic judgments. Only called for items that first match avoidance language patterns \u2014 most items skip the LLM call entirely."
+      "temperature": 0.0
     },
     "transformer_models": [
       "all-MiniLM-L6-v2"
@@ -227,13 +230,13 @@
         "threshold": 0.35,
         "operator": "<"
       },
-      "Rule_5_Cross_Extremity_Viable": {
-        "description": "All-items loading >= 0.20",
+      "Rule_5_Cross_Sample_Viable": {
+        "description": "All-items loading >= 0.20 (item loads adequately on the all-items single factor — cross-keying viable)",
         "threshold": 0.2,
         "operator": ">="
       },
-      "Rule_6_Within_Extremity_Viable": {
-        "description": "Within-extremity loading >= 0.25",
+      "Rule_6_Keying_Viable": {
+        "description": "Within-keying loading >= 0.25 (item loads adequately within its own keying stratum — positive items vs. negative items analysed separately)",
         "threshold": 0.25,
         "operator": ">="
       }
@@ -261,12 +264,12 @@
       "min_d_value": 0.35
     },
     "combined_pass_logic": "must_pass_pfa AND must_pass_cv",
-    "final_pool_target_per_extremity": 20,
+    "final_pool_target_per_keying": 20,
     "include_columns": [
       "item_id",
       "scale_name",
       "item_text",
-      "extremity_target",
+      "item_keying",
       "source_example",
       "occurrence_likelihood",
       "flesch_kincaid_grade",
@@ -279,7 +282,9 @@
       "cv_scale_mapping_agreement",
       "cv_majority_mapped_scale",
       "cv_maps_to_target",
+      "encoding_strategy_primary",
       "pfa_atomic_single_loading",
+      "pfa_atomic_reversed_single_loading",
       "pfa_atomic_communality",
       "pfa_atomic_max_sec_loading",
       "pfa_macro_item_to_scale_sim",
@@ -293,8 +298,8 @@
       "Rule_2_Adequate_Single_Factor",
       "Rule_3_Adequate_Communality",
       "Rule_4_Clean_Factor_Structure",
-      "Rule_5_Cross_Extremity_Viable",
-      "Rule_6_Within_Extremity_Viable",
+      "Rule_5_Cross_Sample_Viable",
+      "Rule_6_Keying_Viable",
       "overall_pass",
       "human_review_pass",
       "human_comments",
