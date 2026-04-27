@@ -21,7 +21,7 @@
   },
   "phase_01_behavioral_domains": {
     "_comment": "Behavioral domain generation AND validation in a single phase. Generates observable behavioral examples then validates each against construct, face, and discriminant validity. LEVEL = likelihood of occurrence in target environment, not item extremity.",
-    "examples_per_construct": 2,
+    "examples_per_construct": 4,
     "output_file": "01_behavioral_domains.xlsx",
     "generation_model": "anthropic/claude-haiku-4.5",
     "generation_max_tokens": 1500,
@@ -78,8 +78,8 @@
     "retry_attempts": 3,
     "items_per_keying": {
       "_comment": "Number of items to generate per behavioral domain for each keying direction. positive = standard monotone dominance items (higher trait → stronger endorsement). negative = genuine semantic reversals (lower trait → stronger endorsement), not avoidance or low-intensity statements.",
-      "positive": 4,
-      "negative": 1
+      "positive": 8,
+      "negative": 2
     },
     "inter_example_delay_seconds": 1,
     "duplicate_detection_model": "all-MiniLM-L6-v2",
@@ -198,7 +198,7 @@
   "phase_05_pseudo_factor_analysis": {
     "_comment": "Semantic PFA using sentence transformers as a proxy for item correlations, followed by final item pool assembly and human review package. transformer_models is a list: if multiple models are specified, their cosine similarity matrices are averaged before factor analysis. Reversal for embedding is driven by the item_keying flag from Phase 2 — no heuristic detection is required.",
     "output_file": "05_pseudo_factor_analysis.xlsx",
-    "encoding_strategy": "both",
+    "encoding_strategy": "atomic",
     "_comment_encoding_strategy": "atomic = standard; negatively keyed items embedded as written. atomic_reversed = flip negatively keyed items to their positive-pole paraphrase before embedding (recommended for NEO-type instruments; Guenole et al. 2025). both = run both strategies and report Tucker's congruence for each scale. Based on Guenole et al. (2025): atomic-reversed achieved 94% factor recovery on NEO vs 71% with standard atomic; standard atomic achieved 98% on HEXACO. For unknown instruments, run both and choose per scale.",
     "reversal_rewrite": {
       "_comment": "LLM call used to paraphrase negatively keyed items to their positive-pole equivalents for the atomic_reversed encoding strategy. Triggered deterministically by item_keying == 'negative'; no heuristic detection step is used. Keep temperature at 0 for reproducibility.",
@@ -209,8 +209,8 @@
     "transformer_models": [
       "all-MiniLM-L6-v2"
     ],
-	"factor_extraction_method": "principal",
-    "_factor_extraction_method_comment": "Factor extraction method passed to FactorAnalyzer. Valid values: 'principal' (PCA-style, default — matches Guenole et al. 2025 convention), 'minres' (EFA, minimum residual / OLS), 'ml' (EFA, maximum likelihood). The reported RMSR fit metric is unaffected by this choice; loading patterns will differ slightly between methods on the same similarity matrix.",
+	"factor_extraction_method": "ml",
+    "_factor_extraction_method_comment": "Factor extraction method passed to FactorAnalyzer. Valid values: 'principal' (PCA-style), 'minres' (EFA, minimum residual / OLS), 'ml' (EFA, requires >30 items per scale — matches Guenole et al. 2025 convention.), The reported RMSR fit metric is unaffected by this choice; loading patterns will differ slightly between methods on the same similarity matrix.",
     "pass_rules": {
       "Rule_1_Strong_Single_Factor": {
         "description": "Single factor loading >= 0.40",
