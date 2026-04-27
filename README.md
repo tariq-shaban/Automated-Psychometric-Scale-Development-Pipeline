@@ -54,7 +54,7 @@ The architecture draws directly on the following published work:
 
 > Guenole, N., Samo, A., & Sun, T. (2024). *Pseudo-discrimination parameters from language embeddings*. Open Science Framework. https://doi.org/10.31234/osf.io/9a4qx
 
-> Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices.*
+> Guenole, N., D'Urso, E. D., Samo, A., & Sun, T. (2024). Pseudo factor analysis of language embedding similarity matrices: New ways to model latent constructs.
 
 > Suárez-Álvarez, J., He, Q., Guenole, N., & D'Urso, D. (2026). Using Artificial Intelligence in Test Construction: A Practical Guide. *Psicothema*, *38*(1), 1-12.
 
@@ -340,7 +340,7 @@ For each construct, the LLM generates observable behavioral examples — recurri
 **Input:** `01_behavioral_domains.xlsx` (respects `human_review_pass`)  
 **Output:** `02_generated_items.xlsx`
 
-Survey items are generated from validated behavioral examples as **standard dominance items** — the Likert format used in almost every operational personality inventory (IPIP-NEO-300, IPIP-HEXACO-240, Big Five Inventory, DASS, RIASEC, HSQ) and the format on which the PFA validation literature was developed (Guenole et al., 2025; Milano et al., 2025; Suárez-Álvarez et al., 2026).
+Survey items are generated from validated behavioral examples as **standard dominance items** — the Likert format used in almost every operational personality inventory (IPIP-NEO-300, IPIP-HEXACO-240, Big Five Inventory, DASS, RIASEC, HSQ) and the format on which the PFA validation literature was developed (Guenole et al., 2024; Milano et al., 2025; Suárez-Álvarez et al., 2026).
 
 Items are stratified by **keying direction** (`item_keying`) rather than by location on a trait continuum:
 
@@ -421,18 +421,18 @@ Progress is checkpointed every 100 items. If Phase 4 is interrupted, re-run the 
 **Input:** `04_content_validity.xlsx` (respects `human_review_pass`)  
 **Output:** `05_pseudo_factor_analysis.xlsx`
 
-Phase 5 is the statistical core and final review stage. Sentence transformer embeddings serve as a semantic proxy for item inter-correlations, and factor analysis is applied to the resulting similarity matrices — Pseudo-Factor Analysis (Guenole et al., 2025). One or more sentence transformer models can be specified in `pipeline_settings.json` under `transformer_models`. If multiple models are listed, their cosine similarity matrices are averaged before factor analysis, following Guenole et al. (2025). The default is `all-MiniLM-L6-v2`.
+Phase 5 is the statistical core and final review stage. Sentence transformer embeddings serve as a semantic proxy for item inter-correlations, and factor analysis is applied to the resulting similarity matrices — Pseudo-Factor Analysis (Guenole et al., 2024). One or more sentence transformer models can be specified in `pipeline_settings.json` under `transformer_models`. If multiple models are listed, their cosine similarity matrices are averaged before factor analysis, following Guenole et al. (2024). The default is `all-MiniLM-L6-v2`.
 
 **Flag-driven reversal for embedding**
 
 In the dominance framework the keying direction of every item is already known from Phase 2 (`item_keying = positive` or `item_keying = negative`). Under the `atomic_reversed` encoding strategy, negatively keyed items are paraphrased to their positive-pole equivalents for embedding only — this is triggered deterministically by the keying flag with no heuristic detection step. The LLM is called only to perform the paraphrase. The original `item_text` is always preserved. Whether reversal was applied to a given item under the chosen primary encoding is recorded in `item_reversed_for_embedding`.
 
-**Encoding strategy — atomic vs atomic-reversed (Guenole et al., 2025)**
+**Encoding strategy — atomic vs atomic-reversed (Guenole et al., 2024)**
 
 Two strategies are supported, configurable via `encoding_strategy`:
 
-- **`atomic`** — every item is embedded exactly as written. Best-performing on HEXACO in Guenole et al. (2025) (98% factor recovery).
-- **`atomic_reversed`** — negatively keyed items are paraphrased to their positive-pole equivalents before embedding. Best-performing on NEO in Guenole et al. (2025) (94% factor recovery vs. 71% for standard atomic).
+- **`atomic`** — every item is embedded exactly as written. Best-performing on HEXACO in Guenole et al. (2024) (98% factor recovery).
+- **`atomic_reversed`** — negatively keyed items are paraphrased to their positive-pole equivalents before embedding. Best-performing on NEO in Guenole et al. (2024) (94% factor recovery vs. 71% for standard atomic).
 - **`both`** — runs both strategies and reports per-strategy loadings. The primary strategy (first in the run list) drives pass-rule evaluation; the secondary adds parallel columns. Recommended when the instrument's framework is unknown.
 
 The `encoding_strategy_primary` column on every item records which strategy produced that item's pass-rule loadings.
@@ -454,11 +454,11 @@ Rule 5 (formerly `Cross_Location_Viable`) checks that the item loads at a usable
 
 **DAAL factor identity**
 
-In the joint multi-scale factor analysis, factors are labeled using the Dominant Average Absolute Loading (DAAL) approach (Guenole et al., 2025). For each extracted factor, the mean absolute loading of each scale's items on that factor is computed. The scale with the highest such value — the dominant average absolute loading — is assigned as the factor's label. A scale's DAAL identity is confirmed if its items load most strongly on the factor labeled with its name. Where two scales compete for the same factor, it is labeled `Unassigned`.
+In the joint multi-scale factor analysis, factors are labeled using the Dominant Average Absolute Loading (DAAL) approach (Guenole et al., 2024). For each extracted factor, the mean absolute loading of each scale's items on that factor is computed. The scale with the highest such value — the dominant average absolute loading — is assigned as the factor's label. A scale's DAAL identity is confirmed if its items load most strongly on the factor labeled with its name. Where two scales compete for the same factor, it is labeled `Unassigned`.
 
 **Tucker's congruence**
 
-Earlier versions of this pipeline reported a Tucker's congruence coefficient between the atomic and macro loading solutions per scale. That comparison has been removed. Tucker's congruence as defined by Lorenzo-Seva and ten Berge (2006) is calibrated for comparing two factor loading matrices drawn from the same analytical family — typically an EFA against its cross-validation sample or against published validation loadings (as in Guenole et al., 2025; Milano et al., 2025). Atomic FA loadings and macro item-to-scale cosine similarities do not live in that same comparison space, and the published 0.85 / 0.95 thresholds do not apply. Reporting that comparison as Tucker's was misleading. Encoding-strategy convergence can still be examined directly on the per-strategy loading columns in `PFA_Item_Results` when `encoding_strategy = both`.
+Earlier versions of this pipeline reported a Tucker's congruence coefficient between the atomic and macro loading solutions per scale. That comparison has been removed. Tucker's congruence as defined by Lorenzo-Seva and ten Berge (2006) is calibrated for comparing two factor loading matrices drawn from the same analytical family — typically an EFA against its cross-validation sample or against published validation loadings (as in Guenole et al., 2024; Milano et al., 2025). Atomic FA loadings and macro item-to-scale cosine similarities do not live in that same comparison space, and the published 0.85 / 0.95 thresholds do not apply. Reporting that comparison as Tucker's was misleading. Encoding-strategy convergence can still be examined directly on the per-strategy loading columns in `PFA_Item_Results` when `encoding_strategy = both`.
 
 **Model fit**
 
@@ -615,7 +615,7 @@ c-value and d-value thresholds from Colquitt et al. (2019). Lower for explorator
 }
 ```
 
-`encoding_strategy` can be `atomic`, `atomic_reversed`, or `both`. Use `atomic` for HEXACO-type instruments, `atomic_reversed` for NEO-type instruments, and `both` when the framework is unknown (Guenole et al., 2025).
+`encoding_strategy` can be `atomic`, `atomic_reversed`, or `both`. Use `atomic` for HEXACO-type instruments, `atomic_reversed` for NEO-type instruments, and `both` when the framework is unknown (Guenole et al., 2024).
 
 ---
 
@@ -748,7 +748,7 @@ One keying direction is producing far fewer items than the other, or one is zero
 
 **Atomic encoding** — an embedding strategy in which each item is encoded individually and a cosine similarity matrix is built across items. The pipeline averages atomic similarity matrices across all configured transformer models before factor analysis. Under the plain `atomic` strategy every item is embedded as written.
 
-**Atomic-reversed encoding** — a variant of atomic encoding in which negatively keyed items are paraphrased to their positive-pole equivalents by an LLM before embedding, so that every item shares the same semantic direction. Guenole et al. (2025) reported 94% factor recovery on NEO-type instruments under atomic-reversed versus 71% under standard atomic; on HEXACO the ordering reversed. The pipeline can run either strategy or both (`encoding_strategy` setting).
+**Atomic-reversed encoding** — a variant of atomic encoding in which negatively keyed items are paraphrased to their positive-pole equivalents by an LLM before embedding, so that every item shares the same semantic direction. Guenole et al. (2024) reported 94% factor recovery on NEO-type instruments under atomic-reversed versus 71% under standard atomic; on HEXACO the ordering reversed. The pipeline can run either strategy or both (`encoding_strategy` setting).
 
 **Checkpoint** — a progress save file created by Phase 4 every 100 items (`output/04_checkpoint.json`). Enables automatic resume after interruption.
 
@@ -776,7 +776,7 @@ One keying direction is producing far fewer items than the other, or one is zero
 
 **Flesch-Kincaid grade** — a readability score expressed as a US school grade level. Grade 8 means a typical 13–14-year-old can read the text. The pipeline's primary readability metric.
 
-**GGUM (Generalized Graded Unfolding Model)** — an ideal-point item response theory model in which each item has a characteristic location on the trait continuum. The pipeline previously used GGUM-style location stratification but has been revised to use standard dominance items (the Likert format), which is the framework on which the PFA validation literature was developed (Guenole et al., 2025; Milano et al., 2025). Retained here only for historical reference.
+**GGUM (Generalized Graded Unfolding Model)** — an ideal-point item response theory model in which each item has a characteristic location on the trait continuum. The pipeline previously used GGUM-style location stratification but has been revised to use standard dominance items (the Likert format), which is the framework on which the PFA validation literature was developed (Guenole et al., 2024; Milano et al., 2025). Retained here only for historical reference.
 
 **GPU (Graphics Processing Unit)** — used for AI computation in Phase 5. Significantly faster than CPU for transformer encoding.
 
@@ -812,9 +812,9 @@ One keying direction is producing far fewer items than the other, or one is zero
 
 **SME (Subject Matter Expert)** — in Phase 4, five LLM models play the role of independent SMEs rating item quality. In Phase 3, three LLM models serve as independent bias reviewers.
 
-**Substitutability assumption** — the theoretical basis for PFA: that an item's embedding vector can substitute for an empirical response vector during early-stage scale development (Guenole et al., 2025).
+**Substitutability assumption** — the theoretical basis for PFA: that an item's embedding vector can substitute for an empirical response vector during early-stage scale development (Guenole et al., 2024).
 
-**Tucker's congruence coefficient** — a statistical measure of similarity between two factor loading vectors, with published thresholds from Lorenzo-Seva and ten Berge (2006). Not currently reported by this pipeline: the comparison previously implemented (atomic loadings vs. macro similarities) did not live in the comparison space for which those thresholds are calibrated, so reporting it as Tucker's was misleading. A proper Tucker's comparison would require published validation loadings from an external study (as in Guenole et al., 2025; Milano et al., 2025), which this pipeline does not currently import.
+**Tucker's congruence coefficient** — a statistical measure of similarity between two factor loading vectors, with published thresholds from Lorenzo-Seva and ten Berge (2006). Not currently reported by this pipeline: the comparison previously implemented (atomic loadings vs. macro similarities) did not live in the comparison space for which those thresholds are calibrated, so reporting it as Tucker's was misleading. A proper Tucker's comparison would require published validation loadings from an external study (as in Guenole et al., 2024; Milano et al., 2025), which this pipeline does not currently import.
 
 ---
 
@@ -822,7 +822,7 @@ One keying direction is producing far fewer items than the other, or one is zero
 
 > Guenole, N., Samo, A., & Sun, T. (2024). *Pseudo-discrimination parameters from language embeddings*. Open Science Framework. https://doi.org/10.31234/osf.io/9a4qx
 
-> Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025, March). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices.*
+> Guenole, N., D'Urso, E. D., Samo, A., & Sun, T. (2024). Pseudo factor analysis of language embedding similarity matrices: New ways to model latent constructs.
 
 > Suárez-Álvarez, J., He, Q., Guenole, N., & D'Urso, D. (2026). Using Artificial Intelligence in Test Construction: A Practical Guide. *Psicothema*, *38*(1), 1-12.
 
