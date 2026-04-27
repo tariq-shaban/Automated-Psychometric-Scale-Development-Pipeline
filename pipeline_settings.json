@@ -25,10 +25,10 @@
     "output_file": "01_behavioral_domains.xlsx",
     "generation_model": "anthropic/claude-haiku-4.5",
     "generation_max_tokens": 1500,
-    "generation_temperature": 0.7,
+    "generation_temperature": 0.8,
     "validation_model": "openai/gpt-4o",
     "validation_max_tokens": 2000,
-    "validation_temperature": 0.5,
+    "validation_temperature": 0.3,
     "retry_attempts": 3,
     "retry_delay_base_seconds": 2,
     "min_valid_examples_threshold": 5,
@@ -209,6 +209,8 @@
     "transformer_models": [
       "all-MiniLM-L6-v2"
     ],
+	"factor_extraction_method": "principal",
+    "_factor_extraction_method_comment": "Factor extraction method passed to FactorAnalyzer. Valid values: 'principal' (PCA-style, default — matches Guenole et al. 2025 convention), 'minres' (EFA, minimum residual / OLS), 'ml' (EFA, maximum likelihood). The reported RMSR fit metric is unaffected by this choice; loading patterns will differ slightly between methods on the same similarity matrix.",
     "pass_rules": {
       "Rule_1_Strong_Single_Factor": {
         "description": "Single factor loading >= 0.40",
