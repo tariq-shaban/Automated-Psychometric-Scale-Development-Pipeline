@@ -52,17 +52,17 @@ This pipeline was originally conceived and developed as **Project Majdal** by Ta
 
 The architecture draws directly on the following published work:
 
+> Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices*. PsyArXiv. https://osf.io/preprints/psyarxiv/vf3se_v2
+
 > Guenole, N., Samo, A., & Sun, T. (2024). *Pseudo-discrimination parameters from language embeddings*. Open Science Framework. https://doi.org/10.31234/osf.io/9a4qx
 
-> Guenole, N., D'Urso, E. D., Samo, A., & Sun, T. (2024). Pseudo factor analysis of language embedding similarity matrices: New ways to model latent constructs.
+> Suárez-Álvarez, J., He, Q., Guenole, N., & D'Urso, D. (2026). Using artificial intelligence in test construction: A practical guide. *Psicothema*, *38*(1), 1–12. https://doi.org/10.70478/psicothema.2026.38.01
 
-> Suárez-Álvarez, J., He, Q., Guenole, N., & D'Urso, D. (2026). Using Artificial Intelligence in Test Construction: A Practical Guide. *Psicothema*, *38*(1), 1-12.
+> Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168. https://doi.org/10.1016/j.crbeha.2025.100168
 
-> Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168.
+> Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1–29.
 
-> Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1-29.
-
-> Lee, P., Son, M., Zhou, S., Joo, S., Jia, Z., & Cheng, V. (2025). The journey of forced choice measurement over 80 years: Past, present, and future. *Organizational Research Methods*, *28*(4), 680-722.
+> Lee, P., Son, M., Zhou, S., Joo, S., Jia, Z., & Cheng, V. (2025). The journey of forced choice measurement over 80 years: Past, present, and future. *Organizational Research Methods*, *28*(4), 680–722. https://doi.org/10.1177/10944281251350687
 
 ---
 
@@ -820,17 +820,17 @@ One keying direction is producing far fewer items than the other, or one is zero
 
 ## 13. References
 
+> Guenole, N., D'Urso, E. D., Samo, A., Sun, T., & Haslbeck, J. M. (2025). *Enhancing scale development: Pseudo factor analysis of language embedding similarity matrices*. PsyArXiv. https://osf.io/preprints/psyarxiv/vf3se_v2
+
 > Guenole, N., Samo, A., & Sun, T. (2024). *Pseudo-discrimination parameters from language embeddings*. Open Science Framework. https://doi.org/10.31234/osf.io/9a4qx
 
-> Guenole, N., D'Urso, E. D., Samo, A., & Sun, T. (2024). Pseudo factor analysis of language embedding similarity matrices: New ways to model latent constructs.
+> Suárez-Álvarez, J., He, Q., Guenole, N., & D'Urso, D. (2026). Using artificial intelligence in test construction: A practical guide. *Psicothema*, *38*(1), 1–12. https://doi.org/10.70478/psicothema.2026.38.01
 
-> Suárez-Álvarez, J., He, Q., Guenole, N., & D'Urso, D. (2026). Using Artificial Intelligence in Test Construction: A Practical Guide. *Psicothema*, *38*(1), 1-12.
+> Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168. https://doi.org/10.1016/j.crbeha.2025.100168
 
-> Milano, N., Luongo, M., Ponticorvo, M., & Marocco, D. (2025). Semantic analysis of test items through large language model embeddings predicts a-priori factorial structure of personality tests. *Current Research in Behavioral Sciences*, *8*, 100168.
+> Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1–29.
 
-> Lee, P., Son, M., & Jia, Z. (2025). AI-powered automatic item generation for psychological tests: A conceptual framework for an LLM-based multi-agent AIG system. *Journal of Business and Psychology*, 1-29.
-
-> Lee, P., Son, M., Zhou, S., Joo, S., Jia, Z., & Cheng, V. (2025). The journey of forced choice measurement over 80 years: Past, present, and future. *Organizational Research Methods*, *28*(4), 680-722.
+> Lee, P., Son, M., Zhou, S., Joo, S., Jia, Z., & Cheng, V. (2025). The journey of forced choice measurement over 80 years: Past, present, and future. *Organizational Research Methods*, *28*(4), 680–722. https://doi.org/10.1177/10944281251350687
 
 > Lorenzo-Seva, U., & ten Berge, J. M. F. (2006). Tucker's congruence coefficient as a meaningful index of factor similarity. *Methodology: European Journal of Research Methods for the Behavioral and Social Sciences*, *2*(2), 57–64. https://doi.org/10.1027/1614-2241.2.2.57
 
@@ -838,11 +838,11 @@ One keying direction is producing far fewer items than the other, or one is zero
 
 > Colquitt, J. A., Sabey, T. B., Rodell, J. B., & Hill, E. T. (2019). Content validation guidelines: Evaluation criteria for definitional correspondence and definitional distinctiveness. *Journal of Applied Psychology*, *104*(10), 1243–1265. https://doi.org/10.1037/apl0000406
 
-> Zieky, M. J. (2013). *So much has changed: How the setting of cutscores has evolved since the 1980s.* In M. J. Zieky (Ed.), *Setting performance standards: Foundations, methods, and innovations* (2nd ed., pp. 15–34). Lawrence Erlbaum Associates.
+> Zieky, M. J. (2012). So much has changed: An historical overview of setting cut scores. In G. J. Cizek (Ed.), *Setting performance standards: Foundations, methods, and innovations* (2nd ed., pp. 15–31). Routledge.
 
 > Clark, L. A., & Watson, D. (1995). Constructing validity: Basic issues in objective scale development. *Psychological Assessment*, *7*(3), 309–319. https://doi.org/10.1037/1040-3590.7.3.309
 
-> DeVellis, R. F. (2017). *Scale Development: Theory and Applications* (4th ed.). SAGE Publications.
+> DeVellis, R. F. (2017). *Scale development: Theory and applications* (4th ed.). SAGE Publications.
 
 ---
 
